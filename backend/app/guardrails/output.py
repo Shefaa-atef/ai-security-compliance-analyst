@@ -7,6 +7,7 @@ leniently than policy allows. Every correction is reported back to the user.
 
 from dataclasses import dataclass
 
+from ..i18n import ResponseLanguage
 from ..schemas import AgentAssessment
 from . import evidence, policy
 from .corrections import Corrections
@@ -20,13 +21,15 @@ class GuardrailResult:
     corrections: Corrections
 
 
-def apply(assessment: AgentAssessment, scenario: str, signals: dict) -> GuardrailResult:
-    corrections = Corrections()
+def apply(
+    assessment: AgentAssessment, scenario: str, signals: dict, response_language: ResponseLanguage = "en"
+) -> GuardrailResult:
+    corrections = Corrections(language=response_language)
 
     findings = evidence.complete_findings(assessment.findings, corrections)
     for finding in findings:
-        finding.explanation = _text_or(finding.explanation, "No explanation was provided.")
-        finding.recommendation = _text_or(finding.recommendation, "Review this requirement manually.")
+        finding.explanation = _text_or(finding.explanation, corrections.text("fallback.explanation"))
+        finding.recommendation = _text_or(finding.recommendation, corrections.text("fallback.recommendation"))
     evidence.verify_quotes(findings, scenario, corrections)
     evidence.require_evidence_for_support(findings, corrections)
 
@@ -36,14 +39,14 @@ def apply(assessment: AgentAssessment, scenario: str, signals: dict) -> Guardrai
     policy.enforce_missing_control_uncertainty(by_id, corrections)
     risk_level, risk_rationale = policy.apply_risk_floor(
         assessment.risk_level,
-        _text_or(assessment.risk_rationale, "No rationale was provided."),
+        _text_or(assessment.risk_rationale, corrections.text("fallback.rationale")),
         signals,
         corrections,
     )
     policy.enforce_high_risk_review(by_id, risk_level, corrections)
 
     cleaned = AgentAssessment(
-        summary=_text_or(assessment.summary, "Assessment completed. Review the findings below."),
+        summary=_text_or(assessment.summary, corrections.text("fallback.summary")),
         risk_level=risk_level,
         risk_rationale=risk_rationale,
         findings=findings,

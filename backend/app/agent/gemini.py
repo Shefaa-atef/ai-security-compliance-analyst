@@ -7,8 +7,9 @@ import httpx
 from google.genai import errors, types
 from pydantic import ValidationError
 
+from ..i18n import ResponseLanguage
 from ..schemas import AgentAssessment
-from .prompt import SYSTEM_PROMPT, user_message
+from .prompt import system_prompt, user_message
 from .runner import AgentRun, AssessmentUnavailable
 from .tools import TOOL_DEFINITIONS, run_tool
 
@@ -24,7 +25,7 @@ class GeminiAssessmentAgent:
         self.max_turns = max_turns
         self.deadline_seconds = deadline_seconds
 
-    def run(self, scenario: str) -> AgentRun:
+    def run(self, scenario: str, response_language: ResponseLanguage = "en") -> AgentRun:
         deadline = time.monotonic() + self.deadline_seconds
         contents = [types.Content(role="user", parts=[types.Part.from_text(text=user_message(scenario))])]
         tool_calls: list[dict] = []
@@ -33,7 +34,7 @@ class GeminiAssessmentAgent:
             remaining = deadline - time.monotonic()
             if remaining < 3:
                 raise AssessmentUnavailable("Assessment exceeded its time budget")
-            response = self._request(contents, completed, remaining)
+            response = self._request(contents, completed, remaining, response_language)
             calls = response.function_calls or []
             if not calls or not response.candidates:
                 raise AssessmentUnavailable("Gemini did not return a usable tool response")
@@ -61,7 +62,9 @@ class GeminiAssessmentAgent:
             contents.append(types.Content(role="user", parts=results))
         raise AssessmentUnavailable("Gemini did not finish within the turn limit")
 
-    def _request(self, contents: list, completed: set[str], remaining: float):
+    def _request(
+        self, contents: list, completed: set[str], remaining: float, response_language: ResponseLanguage
+    ):
         declarations = [
             types.FunctionDeclaration(
                 name=tool["name"],
@@ -83,7 +86,7 @@ class GeminiAssessmentAgent:
                 model=self.model,
                 contents=contents,
                 config=types.GenerateContentConfig(
-                    system_instruction=SYSTEM_PROMPT,
+                    system_instruction=system_prompt(response_language),
                     tools=[types.Tool(function_declarations=declarations)],
                     tool_config=types.ToolConfig(
                         function_calling_config=types.FunctionCallingConfig(mode="ANY")

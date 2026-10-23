@@ -14,8 +14,9 @@ from dataclasses import dataclass, field
 import anthropic
 from pydantic import ValidationError
 
+from ..i18n import ResponseLanguage
 from ..schemas import AgentAssessment
-from .prompt import SYSTEM_PROMPT, user_message
+from .prompt import system_prompt, user_message
 from .tools import TOOL_DEFINITIONS, run_tool
 
 log = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ class AssessmentAgent:
         self.max_turns = max_turns
         self.deadline_seconds = deadline_seconds
 
-    def run(self, scenario: str) -> AgentRun:
+    def run(self, scenario: str, response_language: ResponseLanguage = "en") -> AgentRun:
         deadline = time.monotonic() + self.deadline_seconds
         messages: list[dict] = [{"role": "user", "content": user_message(scenario)}]
         tool_calls: list[dict] = []
@@ -58,7 +59,7 @@ class AssessmentAgent:
             if remaining < MIN_SECONDS_FOR_A_TURN:
                 raise AssessmentUnavailable("Assessment exceeded its time budget")
 
-            response = self._request(messages, timeout=remaining)
+            response = self._request(messages, timeout=remaining, response_language=response_language)
 
             if response.stop_reason == "tool_use":
                 # Append the full content so thinking blocks are passed back unchanged.
@@ -74,12 +75,12 @@ class AssessmentAgent:
 
         raise AssessmentUnavailable("Agent did not finish within the turn limit")
 
-    def _request(self, messages: list[dict], timeout: float):
+    def _request(self, messages: list[dict], timeout: float, response_language: ResponseLanguage = "en"):
         try:
             response = self.client.messages.parse(
                 model=self.model,
                 max_tokens=MAX_OUTPUT_TOKENS,
-                system=SYSTEM_PROMPT,
+                system=system_prompt(response_language),
                 tools=TOOL_DEFINITIONS,
                 messages=messages,
                 output_format=AgentAssessment,

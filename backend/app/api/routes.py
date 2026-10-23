@@ -28,7 +28,9 @@ def assess(
         raise HTTPException(status_code=429, detail="Too many requests. Try again shortly.")
 
     try:
-        return pipeline.assess(body.scenario, agent, settings.audit_log_path, request.state.request_id)
+        return pipeline.assess(
+            body.scenario, agent, settings.audit_log_path, request.state.request_id, body.response_language
+        )
     except pipeline.ScenarioRejected:
         raise HTTPException(
             status_code=422, detail="Scenario must contain at least 20 meaningful characters."

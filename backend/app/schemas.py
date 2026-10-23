@@ -9,6 +9,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
+from .i18n import ResponseLanguage
+
 Status = Literal["supported", "gap", "needs_clarification", "not_applicable"]
 RiskLevel = Literal["low", "medium", "high", "unknown"]
 
@@ -17,6 +19,7 @@ MAX_SCENARIO_CHARS = 12_000
 
 
 class AssessmentRequest(BaseModel):
+    response_language: ResponseLanguage = "en"
     scenario: str = Field(min_length=MIN_SCENARIO_CHARS, max_length=MAX_SCENARIO_CHARS)
 
     @field_validator("scenario", mode="before")
@@ -49,6 +52,7 @@ class AgentAssessment(BaseModel):
 
 
 class AssessmentResponse(AgentAssessment):
+    response_language: ResponseLanguage = "en"
     assessment_id: str
     review_steps: list[str]
     guardrail_notes: list[str] = []

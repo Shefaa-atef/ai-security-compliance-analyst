@@ -19,12 +19,9 @@ def enforce_human_oversight(findings: dict[str, Finding], signals: dict, correct
         corrections.change_status(
             oversight,
             "gap",
-            "AI-003 changed to gap: the AI output drives decisions and no human review is described.",
+            corrections.text("oversight.note"),
         )
-        oversight.recommendation = (
-            "Require a qualified person to review and approve every AI recommendation "
-            "before a decision is made."
-        )
+        oversight.recommendation = corrections.text("oversight.action")
 
 
 def enforce_third_party_review(findings: dict[str, Finding], signals: dict, corrections: Corrections) -> None:
@@ -34,7 +31,7 @@ def enforce_third_party_review(findings: dict[str, Finding], signals: dict, corr
         corrections.change_status(
             third_party,
             "needs_clarification",
-            "AI-006 changed to needs clarification: the scenario uses a third-party service.",
+            corrections.text("vendor.note"),
         )
 
 
@@ -42,11 +39,18 @@ def apply_risk_floor(
     level: RiskLevel, rationale: str, signals: dict, corrections: Corrections
 ) -> tuple[RiskLevel, str]:
     """Raise the risk level to the policy minimum. Never lowers it."""
-    floor, reason = risk_signals.risk_floor(signals)
+    floor, reason = risk_signals.risk_floor(signals, corrections.language)
     if risk_signals.at_least(level, floor):
         return level, rationale
-    corrections.add_note(f"Risk level raised from {level} to {floor}. {reason}")
-    return floor, f"{rationale} Policy minimum applied: {reason}"
+    corrections.add_note(
+        corrections.text(
+            "risk.raised",
+            old=corrections.text("level." + level),
+            new=corrections.text("level." + floor),
+            reason=reason,
+        )
+    )
+    return floor, corrections.text("risk.applied", rationale=rationale, reason=reason)
 
 
 def enforce_high_risk_review(
@@ -60,8 +64,7 @@ def enforce_high_risk_review(
         corrections.change_status(
             review,
             "needs_clarification",
-            "AI-008 changed to needs clarification: high-risk use cases require an additional review. "
-            "The finding does not establish that an applicable review has been completed.",
+            corrections.text("review.note"),
         )
 
 
@@ -89,6 +92,5 @@ def enforce_missing_control_uncertainty(findings: dict[str, Finding], correction
             corrections.change_status(
                 finding,
                 "needs_clarification",
-                f"{requirement_id}: the cited evidence does not explicitly establish a control failure. "
-                "Confirm the controls rather than treating an omitted description as a violation.",
+                corrections.text("uncertainty.note", id=requirement_id),
             )

@@ -30,11 +30,11 @@ def complete_findings(findings: list[Finding], corrections: Corrections) -> list
             requirement_id=rid,
             status="needs_clarification",
             evidence=[],
-            explanation="The AI assessment did not cover this requirement.",
-            recommendation="Assess this requirement manually.",
+            explanation=corrections.text("missing.explanation"),
+            recommendation=corrections.text("manual.action"),
         )
     if missing:
-        corrections.add_note(f"The AI did not assess {', '.join(missing)}; marked for manual review.")
+        corrections.add_note(corrections.text("missing.note", ids=", ".join(missing)))
 
     return [by_id[rid] for rid in REQUIREMENT_IDS]
 
@@ -61,9 +61,7 @@ def verify_quotes(findings: list[Finding], scenario: str, corrections: Correctio
 
     corrections.quotes_removed += removed
     if removed:
-        corrections.add_note(
-            f"{removed} evidence quote(s) were removed because they do not appear in the scenario."
-        )
+        corrections.add_note(corrections.text("quotes.removed", count=removed))
 
 
 def require_evidence_for_support(findings: list[Finding], corrections: Corrections) -> None:
@@ -73,8 +71,7 @@ def require_evidence_for_support(findings: list[Finding], corrections: Correctio
             corrections.change_status(
                 finding,
                 "needs_clarification",
-                f"{finding.requirement_id} was rated supported without evidence from the scenario; "
-                "changed to needs clarification.",
+                corrections.text("support.missing", id=finding.requirement_id),
             )
 
 

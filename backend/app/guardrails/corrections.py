@@ -2,11 +2,13 @@
 
 from dataclasses import dataclass, field
 
+from ..i18n import ResponseLanguage, text
 from ..schemas import Finding, Status
 
 
 @dataclass
 class Corrections:
+    language: ResponseLanguage = "en"
     notes: list[str] = field(default_factory=list)
     quotes_verified: int = 0
     quotes_removed: int = 0
@@ -19,8 +21,9 @@ class Corrections:
         finding.status = status
         # A changed status must not retain a contradictory model explanation.
         finding.explanation = reason
-        finding.recommendation = (
-            "Confirm this requirement with a governance reviewer and document the supporting controls."
-        )
+        finding.recommendation = self.text("corrected.action")
         self.status_changes += 1
         self.notes.append(reason)
+
+    def text(self, key: str, **values) -> str:
+        return text(self.language, key, **values)

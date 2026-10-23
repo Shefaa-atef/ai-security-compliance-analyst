@@ -12,6 +12,8 @@ import re
 import unicodedata
 from dataclasses import dataclass, field
 
+from ..i18n import ResponseLanguage, text
+
 # Order matters: more specific patterns run first.
 _REDACTIONS: tuple[tuple[str, re.Pattern], ...] = (
     (
@@ -56,19 +58,18 @@ class PreparedInput:
 
     @property
     def notes(self) -> list[str]:
-        """User-facing explanations of what the input guardrails did."""
+        return self.localized_notes("en")
+
+    def localized_notes(self, language: ResponseLanguage) -> list[str]:
         notes = []
         if self.redactions:
             kinds = ", ".join(
-                f"{label.lower().replace('_', ' ')} ({count})"
+                f"{text(language, 'redaction.' + label)} ({count})"
                 for label, count in sorted(self.redactions.items())
             )
-            notes.append(f"Sensitive values were redacted before AI analysis: {kinds}.")
+            notes.append(text(language, "input.redacted", kinds=kinds))
         if self.injection_signals:
-            notes.append(
-                "The scenario contains text that looks like instructions to the assessor. "
-                "It was treated as scenario data only; review the result with extra care."
-            )
+            notes.append(text(language, "input.injection"))
         return notes
 
 

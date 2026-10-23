@@ -7,6 +7,8 @@ talk its way below.
 
 import re
 
+from ..i18n import ResponseLanguage, text
+
 _SIGNALS: dict[str, tuple[str, str]] = {
     "personal_data": (
         "Personal information about customers or employees",
@@ -68,14 +70,14 @@ def scan(text: str) -> dict[str, dict]:
     return found
 
 
-def risk_floor(signals: dict) -> tuple[str, str | None]:
+def risk_floor(signals: dict, language: ResponseLanguage = "en") -> tuple[str, str | None]:
     """Minimum risk level implied by the signals, with the reason."""
     if "employment_decision" in signals:
-        return "high", "Decisions about employees are treated as high risk."
+        return "high", text(language, "risk.employment")
     if "automated_decision" in signals and ({"personal_data", "financial_data"} & signals.keys()):
-        return "high", "Automated decisions that use personal or financial data are treated as high risk."
+        return "high", text(language, "risk.automated")
     if {"personal_data", "financial_data", "security_data"} & signals.keys():
-        return "medium", "Sensitive data is processed, so the risk cannot be rated low."
+        return "medium", text(language, "risk.sensitive")
     return "unknown", None
 
 

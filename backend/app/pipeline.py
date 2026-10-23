@@ -9,6 +9,7 @@ from .agent import AssessmentRunner, AssessmentUnavailable
 from .governance import risk_signals
 from .guardrails import output as output_guardrails
 from .guardrails.input import prepare_input
+from .i18n import ResponseLanguage
 from .schemas import MIN_SCENARIO_CHARS, AssessmentResponse
 
 
@@ -21,11 +22,13 @@ def assess(
     agent: AssessmentRunner,
     audit_path: str,
     request_id: str | None = None,
+    response_language: ResponseLanguage = "en",
 ) -> AssessmentResponse:
     started = time.monotonic()
     prepared = prepare_input(scenario)
     event = {
         "request_id": request_id,
+        "response_language": response_language,
         "assessment_id": str(uuid.uuid4()),
         "scenario_sha256": audit.scenario_hash(prepared.text),
         "scenario_chars": len(prepared.text),
@@ -41,7 +44,7 @@ def assess(
         raise ScenarioRejected("Scenario is too short after cleanup")
 
     try:
-        run = agent.run(prepared.text)
+        run = agent.run(prepared.text, response_language=response_language)
     except AssessmentUnavailable as exc:
         audit.write(
             audit_path,
@@ -50,13 +53,16 @@ def assess(
         raise
 
     signals = risk_signals.scan(prepared.text)
-    guarded = output_guardrails.apply(run.assessment, prepared.text, signals)
+    guarded = output_guardrails.apply(run.assessment, prepared.text, signals, response_language)
     response = AssessmentResponse(
         **guarded.assessment.model_dump(),
         assessment_id=event["assessment_id"],
-        review_steps=review_trail.build(prepared, run.tool_calls, run.model, guarded.corrections),
-        guardrail_notes=prepared.notes + guarded.corrections.notes,
+        review_steps=review_trail.build(
+            prepared, run.tool_calls, run.model, guarded.corrections, response_language
+        ),
+        guardrail_notes=prepared.localized_notes(response_language) + guarded.corrections.notes,
         model=run.model,
+        response_language=response_language,
     )
 
     audit.write(
