@@ -1,8 +1,10 @@
+import { useI18n } from "../i18n/useI18n";
 import Icon from "./Icon";
 import FindingRow from "./FindingRow";
 import EmptyReport from "./EmptyReport";
 import FindingOverview from "./FindingOverview";
 export default function AssessmentReport({ result, loading, reportRef }) {
+  const { t, formatNumber } = useI18n();
   function download() {
     const url = URL.createObjectURL(
       new Blob([JSON.stringify(result, null, 2)], { type: "application/json" }),
@@ -24,21 +26,22 @@ export default function AssessmentReport({ result, loading, reportRef }) {
     >
       <div className="panel-heading">
         <span className="step-label">
-          02 <span>THE ASSESSMENT</span>
+          {formatNumber(2)} <span>{t("report.eyebrow")} </span>
         </span>
         {result ? (
           <button className="export-button" onClick={download}>
-            <Icon name="download" size={15} /> Export JSON
+            <Icon name="download" size={15} />
+            {t("report.export")}{" "}
           </button>
         ) : (
-          <span className="subtle-pill">Evidence first</span>
+          <span className="subtle-pill">{t("report.evidenceFirst")} </span>
         )}
       </div>
       <div className="report-title">
-        <h2 id="report-heading">A clearer perspective.</h2>
+        <h2 id="report-heading">{t("report.heading")} </h2>
         {result && (
           <span className="subtle-pill">
-            {result.isSample ? "Sample report" : "AI-generated"}
+            {result.isSample ? t("report.sample") : t("report.generated")}
           </span>
         )}
       </div>
@@ -47,32 +50,29 @@ export default function AssessmentReport({ result, loading, reportRef }) {
       ) : (
         <div className="report-body">
           {result.isSample && (
-            <div className="sample-banner">
-              Illustrative customer support assessment · Not an AI-generated
-              result
-            </div>
+            <div className="sample-banner">{t("report.banner")} </div>
           )}
           <div className="risk-summary">
             <span className={`risk-pill risk-${result.risk_level}`}>
-              <span /> {result.risk_level} risk
+              <span /> {t(`risk.${result.risk_level}`)}
             </span>
             <h3>
               {result.risk_level === "high"
-                ? "Give this use case a closer review."
+                ? t("report.highHeading")
                 : result.risk_level === "unknown"
-                  ? "More context is needed."
-                  : "Your findings, in focus."}
+                  ? t("report.unknownHeading")
+                  : t("report.defaultHeading")}
             </h3>
-            <p>{result.summary}</p>
+            <p dir="auto">{result.summary}</p>
             <details className="risk-detail">
-              <summary>Why this risk level?</summary>
-              <p>{result.risk_rationale}</p>
+              <summary>{t("report.whyRisk")} </summary>
+              <p dir="auto">{result.risk_rationale}</p>
             </details>
           </div>
           <FindingOverview findings={result.findings} />
           <div className="findings-heading">
-            <h3>Requirement review</h3>
-            <span>Expand to see the evidence</span>
+            <h3>{t("report.review")} </h3>
+            <span>{t("report.expand")} </span>
           </div>
           <div className="findings-list">
             {result.findings.map((finding) => (
@@ -80,11 +80,11 @@ export default function AssessmentReport({ result, loading, reportRef }) {
             ))}
           </div>
           <section className="next-actions">
-            <h3>What comes next</h3>
+            <h3>{t("report.actions")} </h3>
             <ol>
               {result.next_actions.map((action, index) => (
-                <li key={index}>
-                  <span>{index + 1}</span>
+                <li key={index} dir="auto">
+                  <span>{formatNumber(index + 1)}</span>
                   {action}
                 </li>
               ))}
@@ -93,31 +93,35 @@ export default function AssessmentReport({ result, loading, reportRef }) {
           {result.follow_up_questions.length > 0 && (
             <details className="follow-up">
               <summary>
-                Questions to take back to your team{" "}
-                <Icon name="chevron" size={14} />
+                {t("report.questions")} <Icon name="chevron" size={14} />
               </summary>
               <ul>
                 {result.follow_up_questions.map((question, index) => (
-                  <li key={index}>{question}</li>
+                  <li key={index} dir="auto">
+                    {question}
+                  </li>
                 ))}
               </ul>
             </details>
           )}
           <details className="follow-up">
             <summary>
-              Review activity <Icon name="chevron" size={14} />
+              {t("report.activity")} <Icon name="chevron" size={14} />
             </summary>
             <ul>
               {result.review_steps.map((step, index) => (
-                <li key={index}>{step}</li>
+                <li key={index} dir="auto">
+                  {step}
+                </li>
               ))}
             </ul>
-            <small>Reference: {result.assessment_id}</small>
+            <small>
+              {t("report.reference")} <bdi>{result.assessment_id}</bdi>
+            </small>
           </details>
           <p className="report-disclaimer">
-            <Icon name="shield" size={16} /> An initial assessment, not
-            deployment approval. A governance reviewer must validate the
-            findings.
+            <Icon name="shield" size={16} />
+            {t("report.disclaimer")}{" "}
           </p>
         </div>
       )}

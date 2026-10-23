@@ -16,9 +16,7 @@ export function validateAssessment(data) {
     !Array.isArray(data.findings) ||
     data.findings.length !== 8
   )
-    throw new Error(
-      "The assessment service returned an unexpected report format. Please try again.",
-    );
+    throw new Error("errors.format");
   const ids = new Set();
   for (const finding of data.findings) {
     if (
@@ -30,9 +28,7 @@ export function validateAssessment(data) {
       !isText(finding.explanation) ||
       !isText(finding.recommendation)
     )
-      throw new Error(
-        "The assessment service returned invalid requirement findings. Please try again.",
-      );
+      throw new Error("errors.findings");
     ids.add(finding.requirement_id);
   }
   return data;
@@ -53,27 +49,17 @@ export async function assessScenario(scenario) {
     });
     if (!response.ok) {
       const messages = {
-        422: "Check your scenario: use between 20 and 12,000 characters.",
-        429: "Too many requests. Wait a moment and try again.",
-        503: "The AI assessment service is unavailable. Please try again shortly.",
+        422: "errors.validation",
+        429: "errors.rateLimit",
+        503: "errors.unavailable",
       };
-      throw new Error(
-        messages[response.status] ||
-          "The assessment could not be completed. Please try again.",
-      );
+      throw new Error(messages[response.status] || "errors.failed");
     }
     return validateAssessment(await response.json());
   } catch (error) {
-    if (error.name === "AbortError")
-      throw new Error("The assessment took too long. Please try again.");
-    if (error instanceof TypeError)
-      throw new Error(
-        "Cannot reach the assessment service. Check that the Python backend is running.",
-      );
-    if (error instanceof SyntaxError)
-      throw new Error(
-        "The service did not return a valid report. Check the backend configuration.",
-      );
+    if (error.name === "AbortError") throw new Error("errors.timeout");
+    if (error instanceof TypeError) throw new Error("errors.network");
+    if (error instanceof SyntaxError) throw new Error("errors.json");
     throw error;
   } finally {
     clearTimeout(timeout);

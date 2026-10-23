@@ -31,3 +31,9 @@ Vite proxies `/api` to `http://127.0.0.1:8000`. To use another backend, copy `.e
 Findings expand using native keyboard-accessible disclosure controls. Results are rendered as text, never injected HTML. Reports can be exported as JSON. No scenario history is saved to browser storage.
 
 See [backend handoff](../docs/backend-handoff.md) for the complete contract and backend implementation plan.
+
+## Languages
+
+English and Arabic are available from the header language selector, including right-to-left layout and translated sample content. See [localization notes](../docs/frontend-localization.md) for adding languages and the distinction between UI translation and live model output.
+
+Run localization checks from this folder with `node --test tests/i18n.test.js`.

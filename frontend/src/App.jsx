@@ -1,13 +1,16 @@
+import { useI18n } from "./i18n/useI18n";
 import { useRef, useState } from "react";
 import Header from "./components/Header";
 import ScenarioForm from "./components/ScenarioForm";
 import AssessmentReport from "./components/AssessmentReport";
 import RequirementsPanel from "./components/RequirementsPanel";
 import { sampleAssessment } from "./data/sampleAssessment";
+import { getLocalizedSample } from "./data/localizedSample";
 import { assessScenario } from "./lib/api";
 import "./App.css";
 
 export default function App() {
+  const { t } = useI18n();
   const [mode, setMode] = useState("sample");
   const [scenario, setScenario] = useState("");
   const [result, setResult] = useState(null);
@@ -47,7 +50,11 @@ export default function App() {
         }),
       );
     } catch (failure) {
-      setError(failure.message);
+      setError(
+        failure.message.startsWith("errors.")
+          ? failure.message
+          : "errors.failed",
+      );
     } finally {
       setLoading(false);
     }
@@ -61,21 +68,20 @@ export default function App() {
       <main>
         <section className="intro">
           <div className="eyebrow">
-            <span className="status-dot" /> ACME FINANCIAL SERVICES
+            <span className="status-dot" />
+            {t("intro.organization")}{" "}
           </div>
           <h1>
-            Clarity before
-            <br />
-            <span>you deploy.</span>
+            {t("intro.heading")} <br />
+            <span>{t("intro.highlight")} </span>
           </h1>
           <p>
-            A thoughtful first look at your AI use case.
-            <br className="desktop-break" /> Understand the risks. See the
-            evidence. Know what comes next.
+            {t("intro.description")} <br className="desktop-break" />
+            {t("intro.detail")}{" "}
           </p>
           <div className="intro-caption">
-            AI security & compliance analyst <span> / </span> Human judgment,
-            supported.
+            {t("intro.caption")} <span> / </span>
+            {t("intro.human")}{" "}
           </div>
         </section>
         {showRequirements && <RequirementsPanel />}
@@ -90,16 +96,21 @@ export default function App() {
             error={error}
           />
           <AssessmentReport
-            result={result}
+            result={
+              result?.isSample
+                ? { ...getLocalizedSample(t), isSample: true }
+                : result
+            }
             loading={loading}
             reportRef={reportRef}
           />
         </div>
         <footer>
           <span>
-            Acme <strong>·</strong> AI Governance
+            {t("brand.name")} <strong>·</strong>
+            {t("brand.governance")}{" "}
           </span>
-          <span>Initial guidance. Always reviewed by a person.</span>
+          <span>{t("footer.guidance")} </span>
         </footer>
       </main>
     </>

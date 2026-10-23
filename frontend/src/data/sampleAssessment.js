@@ -1,4 +1,4 @@
-import { requirements } from "./requirements";
+import { requirements } from "./requirements.js";
 const explanations = [
   [
     "needs_clarification",

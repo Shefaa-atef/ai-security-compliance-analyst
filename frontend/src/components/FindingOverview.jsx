@@ -1,6 +1,7 @@
-import { statusLabels } from "../data/requirements";
+import { useI18n } from "../i18n/useI18n";
 
 export default function FindingOverview({ findings }) {
+  const { t, formatNumber } = useI18n();
   const statuses = [
     "supported",
     "gap",
@@ -9,13 +10,15 @@ export default function FindingOverview({ findings }) {
   ];
 
   return (
-    <dl className="finding-overview" aria-label="Requirement finding totals">
+    <dl className="finding-overview" aria-label={t("report.counts")}>
       {statuses.map((status) => (
         <div key={status} className={`overview-item overview-${status}`}>
           <dd>
-            {findings.filter((finding) => finding.status === status).length}
+            {formatNumber(
+              findings.filter((finding) => finding.status === status).length,
+            )}
           </dd>
-          <dt>{statusLabels[status]}</dt>
+          <dt>{t(`status.${status}`)}</dt>
         </div>
       ))}
     </dl>
