@@ -1,3 +1,4 @@
+import "./FindingRow.css";
 import { useI18n } from "../i18n/useI18n";
 import { requirements } from "../data/requirements";
 import Icon from "./Icon";

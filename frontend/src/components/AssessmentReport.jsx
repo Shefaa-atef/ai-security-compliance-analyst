@@ -1,3 +1,4 @@
+import "./AssessmentReport.css";
 import { useI18n } from "../i18n/useI18n";
 import Icon from "./Icon";
 import FindingRow from "./FindingRow";

@@ -1,3 +1,4 @@
+import "./EmptyReport.css";
 import { useI18n } from "../i18n/useI18n";
 import Icon from "./Icon";
 export default function EmptyReport({ loading }) {

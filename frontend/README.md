@@ -26,7 +26,10 @@ Vite proxies `/api` to `http://127.0.0.1:8000`. To use another backend, copy `.e
 - `src/lib/api.js`: network requests, timeout, and response validation.
 - `src/App.jsx`: shared state and orchestration.
 - `src/index.css`: global tokens and base styles.
-- `src/App.css`: responsive layout and component styles.
+- `src/App.css`: page width, workspace columns, and footer only.
+- `src/components/*.css`: styles and responsive rules beside the component that owns them.
+- `src/styles/shared.css`: shared panel primitives, badges, and animations.
+- `src/styles/rtl.css`: direction-specific typography and icons.
 
 Findings expand using native keyboard-accessible disclosure controls. Results are rendered as text, never injected HTML. Reports can be exported as JSON. No scenario history is saved to browser storage.
 

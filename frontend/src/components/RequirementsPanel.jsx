@@ -1,3 +1,4 @@
+import "./RequirementsPanel.css";
 import { useI18n } from "../i18n/useI18n";
 import { requirements } from "../data/requirements";
 export default function RequirementsPanel() {

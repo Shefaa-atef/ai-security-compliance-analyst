@@ -1,3 +1,4 @@
+import PageIntro from "./components/PageIntro";
 import { useI18n } from "./i18n/useI18n";
 import { useRef, useState } from "react";
 import Header from "./components/Header";
@@ -66,24 +67,7 @@ export default function App() {
         expanded={showRequirements}
       />
       <main>
-        <section className="intro">
-          <div className="eyebrow">
-            <span className="status-dot" />
-            {t("intro.organization")}{" "}
-          </div>
-          <h1>
-            {t("intro.heading")} <br />
-            <span>{t("intro.highlight")} </span>
-          </h1>
-          <p>
-            {t("intro.description")} <br className="desktop-break" />
-            {t("intro.detail")}{" "}
-          </p>
-          <div className="intro-caption">
-            {t("intro.caption")} <span> / </span>
-            {t("intro.human")}{" "}
-          </div>
-        </section>
+        <PageIntro />
         {showRequirements && <RequirementsPanel />}
         <div className="workspace">
           <ScenarioForm

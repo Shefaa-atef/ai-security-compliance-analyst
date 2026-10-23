@@ -1,3 +1,4 @@
+import "./Header.css";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useI18n } from "../i18n/useI18n";
 import Icon from "./Icon";

@@ -1,3 +1,4 @@
+import "./ScenarioForm.css";
 import { useI18n } from "../i18n/useI18n";
 import { scenarios } from "../data/scenarios";
 import Icon from "./Icon";

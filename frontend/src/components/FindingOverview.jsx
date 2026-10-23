@@ -1,3 +1,4 @@
+import "./FindingOverview.css";
 import { useI18n } from "../i18n/useI18n";
 
 export default function FindingOverview({ findings }) {

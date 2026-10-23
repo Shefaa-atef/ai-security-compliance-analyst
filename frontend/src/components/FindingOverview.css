@@ -1,0 +1,49 @@
+.finding-overview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 20px 0 0;
+}
+
+.overview-item {
+  padding: 13px 8px;
+  border: 1px solid #ededf1;
+  border-radius: 12px;
+  text-align: center;
+  background: #fcfcfd;
+}
+
+.overview-item dd {
+  margin: 0 0 5px;
+  font-size: 24px;
+  font-weight: 550;
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.overview-item dt {
+  font-size: 10px;
+  line-height: 1.5;
+  color: #73737c;
+}
+
+.overview-supported dd {
+  color: #28815e;
+}
+
+.overview-gap dd {
+  color: #b93f34;
+}
+
+.overview-needs_clarification dd {
+  color: #96743c;
+}
+
+.overview-not_applicable dd {
+  color: #85858f;
+}
+@media (max-width: 420px) {
+  .finding-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

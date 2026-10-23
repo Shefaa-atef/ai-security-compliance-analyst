@@ -1,0 +1,93 @@
+.empty-report {
+  text-align: center;
+  padding: 42px 18px 28px;
+}
+
+.report-symbol {
+  width: 88px;
+  height: 88px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 28px;
+  position: relative;
+  color: #0071e3;
+  background: linear-gradient(145deg, #fafcff, #e8f2ff);
+  border-radius: 26px;
+  border: 1px solid #e0ecfb;
+  box-shadow:
+    inset 0 2px 4px #fff,
+    0 16px 35px #0071e30a;
+}
+
+.symbol-orbit {
+  position: absolute;
+  inset: -14px;
+  border: 1px solid #edf1f8;
+  border-radius: 36px;
+  transform: rotate(-8deg);
+}
+
+.empty-report h3 {
+  font-size: 23px;
+  letter-spacing: -0.7px;
+  font-weight: 550;
+}
+
+.empty-report > p {
+  font-size: 14px;
+  color: #80808a;
+  line-height: 1.8;
+  max-width: 380px;
+  margin: 12px auto 30px;
+}
+
+.preview-stack {
+  background: #fafafb;
+  border: 1px solid #eeeef2;
+  border-radius: 15px;
+  text-align: start;
+  max-width: 420px;
+  margin: auto;
+  padding: 5px 17px;
+}
+
+.preview-stack > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 0;
+  font-size: 13px;
+  color: #72727d;
+}
+
+.preview-stack > div + div {
+  border-top: 1px solid #ededf1;
+}
+
+.preview-stack svg {
+  color: #919bad;
+}
+
+.mini-line {
+  width: 22px;
+  height: 4px;
+  background: #e8e9ee;
+  border-radius: 5px;
+  margin-inline-start: auto;
+}
+
+.empty-caption {
+  display: block;
+  font-size: 11px;
+  color: #96969e;
+  margin-top: 29px;
+}
+
+.is-loading .symbol-orbit {
+  animation: spin 7s linear infinite;
+}
+@media (max-width: 1000px) {
+  .empty-report {
+    padding-inline: 0;
+  }
+}
