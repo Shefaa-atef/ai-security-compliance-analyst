@@ -1,0 +1,20 @@
+.report-language {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.report-language-mismatch {
+  padding: 12px 14px;
+  background: #f1f6fe;
+  border: 1px solid #dce8fa;
+  border-radius: 11px;
+}
+.report-language button {
+  margin-top: 8px;
+  padding: 0;
+  color: var(--blue);
+  border: 0;
+  background: transparent;
+  font-size: 12px;
+}

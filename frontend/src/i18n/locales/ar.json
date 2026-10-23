@@ -146,5 +146,10 @@
   "report.guardrails": "ملاحظات الضوابط الوقائية",
   "report.guardrailsDescription": "توضّح هذه الملاحظات إجراءات حماية المدخلات والتصحيحات المطبّقة على التقييم. راجعها إلى جانب النتائج.",
   "report.model": "نموذج التقييم:",
-  "form.outputLanguage": "لغة الواجهة لا تضمن لغة النتائج المولّدة بالذكاء الاصطناعي."
+  "form.outputLanguage": "يتبع التحليل اللغة التي اخترتها. تبقى الأدلة بلغة السيناريو الأصلية.",
+  "report.language": "لغة التقرير: {language}",
+  "report.reassessLanguage": "إعادة التقييم باللغة {language}",
+  "report.languageMismatch": "أُنشئ هذا التقرير باللغة {language}. تغيير لغة الواجهة لا يترجم النتائج السابقة.",
+  "language.names.en": "الإنجليزية",
+  "language.names.ar": "العربية"
 }

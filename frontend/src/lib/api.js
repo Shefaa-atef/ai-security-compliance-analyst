@@ -5,7 +5,7 @@ export function createAssessmentClient({
   fetchImpl = globalThis.fetch,
   timeoutMs = 60000,
 } = {}) {
-  return async function assessScenario(scenario) {
+  return async function assessScenario(scenario, responseLanguage = "en") {
     const trimmed = scenario.trim();
     if (trimmed.length < 20 || trimmed.length > 12000)
       throw new Error("errors.validation");
@@ -17,7 +17,10 @@ export function createAssessmentClient({
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ scenario: trimmed }),
+          body: JSON.stringify({
+            scenario: trimmed,
+            response_language: responseLanguage,
+          }),
           signal: controller.signal,
         },
       );

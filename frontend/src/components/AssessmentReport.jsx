@@ -1,3 +1,4 @@
+import ReportLanguageNotice from "./ReportLanguageNotice";
 import "./AssessmentReport.css";
 import { useI18n } from "../i18n/useI18n";
 import Icon from "./Icon";
@@ -5,7 +6,12 @@ import FindingRow from "./FindingRow";
 import EmptyReport from "./EmptyReport";
 import FindingOverview from "./FindingOverview";
 import GuardrailNotes from "./GuardrailNotes";
-export default function AssessmentReport({ result, loading, reportRef }) {
+export default function AssessmentReport({
+  result,
+  loading,
+  reportRef,
+  onReassess,
+}) {
   const { t, formatNumber } = useI18n();
   function download() {
     const url = URL.createObjectURL(
@@ -51,6 +57,13 @@ export default function AssessmentReport({ result, loading, reportRef }) {
         <EmptyReport loading={loading} />
       ) : (
         <div className="report-body">
+          {!result.isSample && (
+            <ReportLanguageNotice
+              language={result.response_language || "en"}
+              loading={loading}
+              onReassess={onReassess}
+            />
+          )}
           {result.isSample && (
             <div className="sample-banner">{t("report.banner")} </div>
           )}

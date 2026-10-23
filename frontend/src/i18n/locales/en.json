@@ -146,5 +146,10 @@
   "report.guardrails": "Guardrail observations",
   "report.guardrailsDescription": "These notes record input protections and corrections applied to the assessment. Review them alongside the findings.",
   "report.model": "Assessment model:",
-  "form.outputLanguage": "The interface language does not guarantee the language of AI-generated results."
+  "form.outputLanguage": "Analysis follows your selected language. Evidence stays in the original scenario language.",
+  "report.language": "Report language: {language}",
+  "report.reassessLanguage": "Reassess in {language}",
+  "report.languageMismatch": "This report was generated in {language}. Changing the interface does not translate existing findings.",
+  "language.names.en": "English",
+  "language.names.ar": "Arabic"
 }

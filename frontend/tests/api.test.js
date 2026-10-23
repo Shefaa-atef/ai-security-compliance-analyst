@@ -45,7 +45,10 @@ test("sends the agreed request contract with trimmed input", async () => {
   assert.equal(request.url, "http://localhost:8000/api/assess");
   assert.equal(request.options.method, "POST");
   assert.equal(request.options.headers["Content-Type"], "application/json");
-  assert.deepEqual(JSON.parse(request.options.body), { scenario });
+  assert.deepEqual(JSON.parse(request.options.body), {
+    scenario,
+    response_language: "en",
+  });
 });
 
 test("rejects invalid input before making a request", async () => {
@@ -108,4 +111,17 @@ test("reports network, invalid JSON, malformed reports, and request timeout", as
       }),
   });
   await assert.rejects(() => assess(scenario), /errors.timeout/);
+});
+
+test("passes the requested response language without translating scenario text", async () => {
+  let body;
+  const assess = createAssessmentClient({
+    fetchImpl: async (_url, options) => {
+      body = JSON.parse(options.body);
+      return okResponse({ ...sampleAssessment, response_language: "ar" });
+    },
+  });
+  const result = await assess(scenario, "ar");
+  assert.deepEqual(body, { scenario, response_language: "ar" });
+  assert.equal(result.response_language, "ar");
 });

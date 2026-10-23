@@ -1,3 +1,4 @@
+import { locales } from "../i18n/config.js";
 import { requirements, statusLabels } from "../data/requirements.js";
 const riskLevels = ["low", "medium", "high", "unknown"];
 const isText = (value) => typeof value === "string" && value.trim().length > 0;
@@ -6,6 +7,8 @@ const isTextList = (value) => Array.isArray(value) && value.every(isText);
 export function validateAssessment(data) {
   if (
     !data ||
+    (data.response_language !== undefined &&
+      !Object.hasOwn(locales, data.response_language)) ||
     !isText(data.assessment_id) ||
     !isText(data.summary) ||
     !riskLevels.includes(data.risk_level) ||

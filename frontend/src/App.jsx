@@ -11,7 +11,7 @@ import { assessScenario } from "./lib/api";
 import "./App.css";
 
 export default function App() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [mode, setMode] = useState("sample");
   const [scenario, setScenario] = useState("");
   const [result, setResult] = useState(null);
@@ -39,7 +39,7 @@ export default function App() {
       const assessment =
         mode === "sample"
           ? sampleAssessment
-          : await assessScenario(scenario.trim());
+          : await assessScenario(scenario.trim(), locale);
       setResult({ ...assessment, isSample: mode === "sample" });
       requestAnimationFrame(() =>
         reportRef.current?.scrollIntoView({
@@ -82,10 +82,15 @@ export default function App() {
           <AssessmentReport
             result={
               result?.isSample
-                ? { ...getLocalizedSample(t), isSample: true }
+                ? {
+                    ...getLocalizedSample(t),
+                    isSample: true,
+                    response_language: locale,
+                  }
                 : result
             }
             loading={loading}
+            onReassess={submit}
             reportRef={reportRef}
           />
         </div>
