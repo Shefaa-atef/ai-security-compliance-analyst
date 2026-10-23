@@ -113,6 +113,9 @@ export default function ScenarioForm({
         <p className="button-caption">
           {sample ? t("form.sampleCaption") : t("form.apiCaption")}
         </p>
+        {!sample && (
+          <p className="button-caption">{t("form.outputLanguage")}</p>
+        )}
       </form>
     </section>
   );

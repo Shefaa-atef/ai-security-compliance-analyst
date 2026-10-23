@@ -37,3 +37,7 @@ See [backend handoff](../docs/backend-handoff.md) for the complete contract and 
 English and Arabic are available from the header language selector, including right-to-left layout and translated sample content. See [localization notes](../docs/frontend-localization.md) for adding languages and the distinction between UI translation and live model output.
 
 Run localization checks from this folder with `node --test tests/i18n.test.js`.
+
+## API response handling
+
+`src/lib/assessmentSchema.js` validates required findings and optional guardrail/model metadata. `src/lib/api.js` handles requests, safe localized error codes, cancellation deadlines, and input limits. Guardrail observations are visible in the report, so backend corrections are not hidden from the reviewer. `npm test` runs the API and localization checks.

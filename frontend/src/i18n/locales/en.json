@@ -112,7 +112,7 @@
   "scenarios.hr.subtitle": "HR information · High impact",
   "scenarios.hr.text": "HR wants to use an AI system to analyze employee performance information and automatically recommend employees for promotion. The system will process employee performance records and HR information. HR intends for the AI system's recommendation to be used as the primary input into promotion decisions.",
   "sample.summary": "Human review is a strong starting point. Before deployment, clarify how customer information is protected and who is accountable for the service.",
-  "sample.risk_rationale": "Illustrative high-risk rating because customer account information will be processed by an external AI provider. A governance reviewer must confirm the classification.",
+  "sample.risk_rationale": "Illustrative medium-risk rating because sensitive customer information is processed with human review. A governance reviewer must confirm the classification and data controls.",
   "sample.next_actions.0": "Identify the accountable business owner.",
   "sample.next_actions.1": "Confirm data controls and complete the provider security assessment.",
   "sample.next_actions.2": "Document access, monitoring, limitations, and the required governance review.",
@@ -142,5 +142,9 @@
   "sample.AI-007.recommendation": "Document allowed uses, known limitations, and prohibited uses.",
   "sample.AI-007.evidence.0": "A customer support team wants to use an LLM to summarize customer conversations and suggest responses to support agents.",
   "sample.AI-008.explanation": "Customer financial information warrants risk review; no review outcome is provided.",
-  "sample.AI-008.recommendation": "Have governance determine the risk classification and required review before deployment."
+  "sample.AI-008.recommendation": "Have governance determine the risk classification and required review before deployment.",
+  "report.guardrails": "Guardrail observations",
+  "report.guardrailsDescription": "These notes record input protections and corrections applied to the assessment. Review them alongside the findings.",
+  "report.model": "Assessment model:",
+  "form.outputLanguage": "The interface language does not guarantee the language of AI-generated results."
 }

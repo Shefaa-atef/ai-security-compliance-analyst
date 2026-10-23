@@ -3,6 +3,7 @@ import Icon from "./Icon";
 import FindingRow from "./FindingRow";
 import EmptyReport from "./EmptyReport";
 import FindingOverview from "./FindingOverview";
+import GuardrailNotes from "./GuardrailNotes";
 export default function AssessmentReport({ result, loading, reportRef }) {
   const { t, formatNumber } = useI18n();
   function download() {
@@ -70,6 +71,7 @@ export default function AssessmentReport({ result, loading, reportRef }) {
             </details>
           </div>
           <FindingOverview findings={result.findings} />
+          <GuardrailNotes notes={result.guardrail_notes} />
           <div className="findings-heading">
             <h3>{t("report.review")} </h3>
             <span>{t("report.expand")} </span>
@@ -118,6 +120,11 @@ export default function AssessmentReport({ result, loading, reportRef }) {
             <small>
               {t("report.reference")} <bdi>{result.assessment_id}</bdi>
             </small>
+            {result.model && (
+              <p className="model-reference">
+                {t("report.model")} <bdi>{result.model}</bdi>
+              </p>
+            )}
           </details>
           <p className="report-disclaimer">
             <Icon name="shield" size={16} />

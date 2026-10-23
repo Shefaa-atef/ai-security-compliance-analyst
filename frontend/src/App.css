@@ -1083,3 +1083,35 @@ footer strong {
     line-height: 1.6;
   }
 }
+.guardrail-notes {
+  margin-top: 18px;
+  padding: 17px;
+  border: 1px solid #e8ddc5;
+  border-radius: 13px;
+  background: #fffcf5;
+}
+.guardrail-notes h3 {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  font-size: 12px;
+  color: #71572d;
+}
+.guardrail-notes > p,
+.guardrail-notes li {
+  font-size: 11px;
+  line-height: 1.75;
+  color: #76664c;
+}
+.guardrail-notes > p {
+  margin-top: 8px;
+}
+.guardrail-notes ul {
+  padding-inline-start: 17px;
+  margin-bottom: 0;
+}
+.model-reference {
+  font-size: 9px;
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+}

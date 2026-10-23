@@ -59,9 +59,9 @@ export const sampleAssessment = {
   assessment_id: "sample-customer-support",
   summary:
     "Human review is a strong starting point. Before deployment, clarify how customer information is protected and who is accountable for the service.",
-  risk_level: "high",
+  risk_level: "medium",
   risk_rationale:
-    "Illustrative high-risk rating because customer account information will be processed by an external AI provider. A governance reviewer must confirm the classification.",
+    "Illustrative medium-risk rating because sensitive customer information is processed with human review. A governance reviewer must confirm the classification and data controls.",
   findings: requirements.map((item, index) => ({
     requirement_id: item.id,
     status: explanations[index][0],

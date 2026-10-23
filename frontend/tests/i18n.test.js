@@ -76,7 +76,12 @@ test("the actual screen and populated report render in every registered language
       const report = renderToStaticMarkup(
         wrap(
           createElement(Report, {
-            result: { ...getLocalizedSample(t), isSample: true },
+            result: {
+              ...getLocalizedSample(t),
+              isSample: true,
+              guardrail_notes: ["<script>alert(1)</script>"],
+              model: "test-model",
+            },
             loading: false,
             reportRef: null,
           }),
@@ -85,6 +90,10 @@ test("the actual screen and populated report render in every registered language
       assert.ok(report.includes(t("sample.summary")));
       assert.ok(report.includes(t("requirements.AI-001.title")));
       assert.ok(report.includes(t("status.needs_clarification")));
+      assert.ok(report.includes(t("report.guardrails")));
+      assert.ok(report.includes("test-model"));
+      assert.ok(report.includes("&lt;script&gt;"));
+      assert.ok(!report.includes("<script>alert(1)</script>"));
     }
   } finally {
     await server.close();
