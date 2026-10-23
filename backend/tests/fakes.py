@@ -1,15 +1,8 @@
 """A scripted stand-in for the Anthropic client so the workflow can be tested offline."""
 from types import SimpleNamespace
 
-from app.requirements_catalog import REQUIREMENT_IDS
+from app.governance.catalog import REQUIREMENT_IDS
 from app.schemas import AgentAssessment, Finding
-
-HR_SCENARIO = (
-    "HR wants to use an AI system to analyze employee performance information and automatically "
-    "recommend employees for promotion. The system will process employee performance records and HR "
-    "information. HR intends for the AI system's recommendation to be used as the primary input into "
-    "promotion decisions."
-)
 
 
 def tool_use(name: str, tool_id: str, args: dict | None = None):
@@ -40,6 +33,15 @@ def make_assessment(**overrides) -> AgentAssessment:
     )
     data.update(overrides)
     return AgentAssessment(**data)
+
+
+def with_finding(assessment: AgentAssessment, requirement_id: str, **changes) -> AgentAssessment:
+    """Return the assessment with one finding's fields replaced."""
+    for finding in assessment.findings:
+        if finding.requirement_id == requirement_id:
+            for key, value in changes.items():
+                setattr(finding, key, value)
+    return assessment
 
 
 class FakeClient:

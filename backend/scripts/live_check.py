@@ -9,16 +9,14 @@ model. Run from the backend folder:
 import sys
 import time
 
-from app.main import get_agent
 from app import service
-from tests.fakes import HR_SCENARIO
-from tests.test_output_guardrails import SUPPORT_SCENARIO
-from tests.test_scenarios import SECURITY_SCENARIO
+from app.governance.use_cases import CUSTOMER_SUPPORT, HR_PROMOTIONS, SECURITY_ASSISTANT
+from app.main import get_agent
 
 CASES = {
-    "A - Customer support": SUPPORT_SCENARIO,
-    "B - Security assistant": SECURITY_SCENARIO,
-    "C - HR promotions": HR_SCENARIO,
+    "A - Customer support": CUSTOMER_SUPPORT.text,
+    "B - Security assistant": SECURITY_ASSISTANT.text,
+    "C - HR promotions": HR_PROMOTIONS.text,
 }
 
 

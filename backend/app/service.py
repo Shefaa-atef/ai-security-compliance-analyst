@@ -3,8 +3,9 @@ import time
 import uuid
 from collections import Counter
 
-from . import audit, output_guardrails, risk_signals
+from . import audit, output_guardrails
 from .agent import AssessmentAgent, AssessmentUnavailable
+from .governance import risk_signals
 from .input_guardrails import prepare_input
 from .schemas import MIN_SCENARIO_CHARS, AssessmentResponse
 

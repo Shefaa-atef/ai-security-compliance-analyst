@@ -5,8 +5,9 @@ from fastapi.testclient import TestClient
 
 from app import main
 from app.agent import AssessmentAgent
+from app.governance.use_cases import HR_PROMOTIONS
 from app.rate_limit import RateLimiter
-from tests.fakes import HR_SCENARIO, FakeClient, final_turn, make_assessment, tool_turn, tool_use
+from tests.fakes import FakeClient, final_turn, make_assessment, tool_turn, tool_use
 
 
 @pytest.fixture
@@ -26,7 +27,7 @@ def test_assess_returns_contract_shape_and_audit_entry(api):
         tool_turn(tool_use("list_requirements", "t1"), tool_use("scan_risk_signals", "t2")),
         final_turn(make_assessment(risk_level="low")),
     ]
-    res = client.post("/api/assess", json={"scenario": HR_SCENARIO + " Contact hr.lead@acme.com."})
+    res = client.post("/api/assess", json={"scenario": HR_PROMOTIONS.text + " Contact hr.lead@acme.com."})
     assert res.status_code == 200
     body = res.json()
 
@@ -56,7 +57,7 @@ def test_ai_failure_returns_503(api):
     client, scripted, audit_file = api
     from types import SimpleNamespace
     scripted["responses"][:] = [SimpleNamespace(stop_reason="refusal", content=[], parsed_output=None, model="m")]
-    res = client.post("/api/assess", json={"scenario": HR_SCENARIO})
+    res = client.post("/api/assess", json={"scenario": HR_PROMOTIONS.text})
     assert res.status_code == 503
     assert json.loads(audit_file.read_text().splitlines()[-1])["outcome"] == "ai_unavailable"
 
@@ -65,11 +66,11 @@ def test_rate_limit_returns_429(api, monkeypatch):
     client, scripted, _ = api
     monkeypatch.setattr(main, "limiter", RateLimiter(1))
     scripted["responses"][:] = [final_turn(make_assessment())]
-    assert client.post("/api/assess", json={"scenario": HR_SCENARIO}).status_code == 200
-    assert client.post("/api/assess", json={"scenario": HR_SCENARIO}).status_code == 429
+    assert client.post("/api/assess", json={"scenario": HR_PROMOTIONS.text}).status_code == 200
+    assert client.post("/api/assess", json={"scenario": HR_PROMOTIONS.text}).status_code == 429
 
 
 def test_missing_api_key_returns_503(monkeypatch):
     monkeypatch.setattr(main.settings, "anthropic_api_key", None)
-    res = TestClient(main.app).post("/api/assess", json={"scenario": HR_SCENARIO})
+    res = TestClient(main.app).post("/api/assess", json={"scenario": HR_PROMOTIONS.text})
     assert res.status_code == 503

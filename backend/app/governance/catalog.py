@@ -5,7 +5,7 @@ This is the internal knowledge base the agent retrieves from through tools.
 signals usually indicate a gap, so conclusions are grounded in policy text
 rather than the model's general knowledge.
 """
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 
 
 @dataclass(frozen=True)

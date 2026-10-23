@@ -8,7 +8,7 @@ import hashlib
 import json
 import logging
 import threading
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 log = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ def scenario_hash(text: str) -> str:
 
 
 def write(path: str, event: dict) -> None:
-    entry = {"timestamp": datetime.now(timezone.utc).isoformat(), **event}
+    entry = {"timestamp": datetime.now(UTC).isoformat(), **event}
     try:
         file = Path(path)
         file.parent.mkdir(parents=True, exist_ok=True)

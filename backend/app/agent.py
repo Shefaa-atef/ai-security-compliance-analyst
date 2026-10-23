@@ -12,8 +12,7 @@ from dataclasses import dataclass, field
 
 import anthropic
 
-from . import requirements_catalog as catalog
-from . import risk_signals
+from .governance import catalog, risk_signals
 from .schemas import AgentAssessment
 
 log = logging.getLogger(__name__)

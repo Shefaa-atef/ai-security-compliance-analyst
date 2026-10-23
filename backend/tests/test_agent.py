@@ -3,7 +3,8 @@ import json
 import pytest
 
 from app.agent import AssessmentAgent, AssessmentUnavailable
-from tests.fakes import HR_SCENARIO, FakeClient, final_turn, make_assessment, tool_turn, tool_use
+from app.governance.use_cases import HR_PROMOTIONS
+from tests.fakes import FakeClient, final_turn, make_assessment, tool_turn, tool_use
 
 
 def test_agent_runs_tools_then_returns_structured_assessment():
@@ -12,7 +13,7 @@ def test_agent_runs_tools_then_returns_structured_assessment():
         tool_turn(tool_use("get_requirement_guidance", "t3", {"requirement_ids": ["AI-003", "AI-008"]})),
         final_turn(make_assessment()),
     ])
-    run = AssessmentAgent(client, "fake-model").run(HR_SCENARIO)
+    run = AssessmentAgent(client, "fake-model").run(HR_PROMOTIONS.text)
 
     assert [c["tool"] for c in run.tool_calls] == ["list_requirements", "scan_risk_signals", "get_requirement_guidance"]
     assert len(run.assessment.findings) == 8
@@ -28,14 +29,14 @@ def test_agent_runs_tools_then_returns_structured_assessment():
 
 def test_scenario_is_wrapped_as_untrusted_data():
     client = FakeClient([final_turn(make_assessment())])
-    AssessmentAgent(client, "fake-model").run(HR_SCENARIO)
+    AssessmentAgent(client, "fake-model").run(HR_PROMOTIONS.text)
     first = client.requests[0]["messages"][0]["content"]
-    assert first.startswith("<scenario>") and HR_SCENARIO in first
+    assert first.startswith("<scenario>") and HR_PROMOTIONS.text in first
 
 
 def test_unknown_tool_is_reported_to_model_not_raised():
     client = FakeClient([tool_turn(tool_use("delete_database", "t1")), final_turn(make_assessment())])
-    run = AssessmentAgent(client, "fake-model").run(HR_SCENARIO)
+    run = AssessmentAgent(client, "fake-model").run(HR_PROMOTIONS.text)
     assert run.tool_calls[0]["is_error"] is True
 
 
@@ -43,8 +44,8 @@ def test_refusal_and_turn_limit_raise_unavailable():
     from types import SimpleNamespace
     refusal = SimpleNamespace(stop_reason="refusal", content=[], parsed_output=None, model="m")
     with pytest.raises(AssessmentUnavailable):
-        AssessmentAgent(FakeClient([refusal]), "m").run(HR_SCENARIO)
+        AssessmentAgent(FakeClient([refusal]), "m").run(HR_PROMOTIONS.text)
 
     looping = [tool_turn(tool_use("list_requirements", f"t{i}")) for i in range(3)]
     with pytest.raises(AssessmentUnavailable):
-        AssessmentAgent(FakeClient(looping), "m", max_turns=3).run(HR_SCENARIO)
+        AssessmentAgent(FakeClient(looping), "m", max_turns=3).run(HR_PROMOTIONS.text)

@@ -8,8 +8,8 @@ correction is reported back to the user as a guardrail note.
 import re
 from dataclasses import dataclass, field
 
-from . import risk_signals
-from .requirements_catalog import REQUIREMENT_IDS
+from .governance import risk_signals
+from .governance.catalog import REQUIREMENT_IDS
 from .schemas import AgentAssessment, Finding
 
 MAX_QUOTES = 3
