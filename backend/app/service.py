@@ -1,4 +1,5 @@
 """Assessment pipeline: input guardrails -> agent -> output guardrails -> audit."""
+import time
 import uuid
 from collections import Counter
 
@@ -42,10 +43,13 @@ def _review_steps(prepared, tool_calls, model, guarded) -> list[str]:
     return steps
 
 
-def assess(scenario: str, agent: AssessmentAgent, audit_path: str) -> AssessmentResponse:
+def assess(scenario: str, agent: AssessmentAgent, audit_path: str,
+           request_id: str | None = None) -> AssessmentResponse:
+    started = time.monotonic()
     assessment_id = str(uuid.uuid4())
     prepared = prepare_input(scenario)
     base_event = {
+        "request_id": request_id,
         "assessment_id": assessment_id,
         "scenario_sha256": audit.scenario_hash(prepared.text),
         "scenario_chars": len(prepared.text),
@@ -61,7 +65,8 @@ def assess(scenario: str, agent: AssessmentAgent, audit_path: str) -> Assessment
     try:
         run = agent.run(prepared.text)
     except AssessmentUnavailable as exc:
-        audit.write(audit_path, {**base_event, "outcome": "ai_unavailable", "reason": str(exc)})
+        audit.write(audit_path, {**base_event, "outcome": "ai_unavailable", "reason": str(exc),
+                                 "duration_ms": round((time.monotonic() - started) * 1000)})
         raise
 
     guarded = output_guardrails.apply(run.assessment, prepared.text, signals)
@@ -77,6 +82,7 @@ def assess(scenario: str, agent: AssessmentAgent, audit_path: str) -> Assessment
     audit.write(audit_path, {
         **base_event,
         "outcome": "completed",
+        "duration_ms": round((time.monotonic() - started) * 1000),
         "model": run.model,
         "tool_calls": [c["tool"] for c in run.tool_calls],
         "risk_signals": list(signals),

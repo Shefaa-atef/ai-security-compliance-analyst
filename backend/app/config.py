@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     audit_log_path: str = "logs/audit.jsonl"
     # Upper bound on agent turns so a misbehaving model cannot loop forever.
     max_agent_turns: int = 6
+    # Total time budget for one assessment; the frontend aborts at 60 seconds.
+    request_deadline_seconds: float = 55.0
 
     @property
     def origins(self) -> list[str]:

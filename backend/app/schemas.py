@@ -6,7 +6,7 @@ guardrails run; it matches the contract in frontend/src/lib/api.js.
 """
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 Status = Literal["supported", "gap", "needs_clarification", "not_applicable"]
 RiskLevel = Literal["low", "medium", "high", "unknown"]
@@ -17,6 +17,12 @@ MAX_SCENARIO_CHARS = 12_000
 
 class AssessmentRequest(BaseModel):
     scenario: str = Field(min_length=MIN_SCENARIO_CHARS, max_length=MAX_SCENARIO_CHARS)
+
+    @field_validator("scenario", mode="before")
+    @classmethod
+    def _trim(cls, value):
+        # Length limits apply to the trimmed text, matching the frontend.
+        return value.strip() if isinstance(value, str) else value
 
 
 class Finding(BaseModel):
