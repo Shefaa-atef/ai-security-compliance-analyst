@@ -28,7 +28,9 @@ export function createAssessmentClient({
         const messages = {
           422: "errors.validation",
           429: "errors.rateLimit",
+          502: "errors.network",
           503: "errors.unavailable",
+          504: "errors.timeout",
         };
         throw new Error(messages[response.status] || "errors.failed");
       }

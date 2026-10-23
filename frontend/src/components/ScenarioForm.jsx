@@ -73,6 +73,7 @@ export default function ScenarioForm({
           </label>
           <textarea
             id="scenario"
+            name="scenario"
             dir="auto"
             value={sample ? t("scenarios.support.text") : scenario}
             onChange={(event) => onScenarioChange(event.target.value)}

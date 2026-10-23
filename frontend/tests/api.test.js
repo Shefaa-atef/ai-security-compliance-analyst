@@ -63,7 +63,9 @@ test("maps HTTP errors to localized keys without leaking server details", async 
   for (const [status, key] of [
     [422, "validation"],
     [429, "rateLimit"],
+    [502, "network"],
     [503, "unavailable"],
+    [504, "timeout"],
     [500, "failed"],
   ]) {
     const assess = createAssessmentClient({

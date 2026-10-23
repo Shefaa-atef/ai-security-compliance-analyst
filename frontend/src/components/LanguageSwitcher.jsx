@@ -7,6 +7,8 @@ export default function LanguageSwitcher() {
     <label className="language-switcher">
       <span className="sr-only">{t("language.label")}</span>
       <select
+        id="interface-language"
+        name="interface_language"
         value={locale}
         onChange={(event) => setLocale(event.target.value)}
         aria-label={t("language.label")}
