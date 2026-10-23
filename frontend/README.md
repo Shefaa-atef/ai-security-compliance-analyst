@@ -1,29 +1,33 @@
 # Frontend
 
-React with Vite, using JavaScript and the standard React starter.
+React + Vite, JavaScript. The interface uses system fonts and local SVG icons; no external font or image requests.
 
-## Local development
-
-Use Node.js 24 LTS and npm. From this folder:
+## Run
 
 ```powershell
+cd frontend
 npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite.
+Open the address printed by Vite. Run `npm run build` and `npm run lint` for checks.
 
-## Checks
+## Modes
 
-```powershell
-npm run lint
-npm run build
-```
+- **Sample preview** displays a fixed customer support report. It makes no AI call and does not assess custom input.
+- **Assess a scenario** sends input to `POST /api/assess`. The Python backend must be running. The frontend validates the response before displaying it.
 
-Run `npm run preview` to preview the production build locally.
+Vite proxies `/api` to `http://127.0.0.1:8000`. To use another backend, copy `.env.example` to `.env.local` and set `VITE_API_BASE_URL`, then restart Vite. All `VITE_` values are public: never place provider credentials there. In production, configure an API reverse proxy or an explicit backend URL and appropriate CORS.
 
-## Scope
+## Organization
 
-Only the framework starter is initialized. Scenario input, assessment results, and Python API integration will be implemented in subsequent steps.
+- `src/components/`: one UI component per file.
+- `src/data/`: requirements, example scenarios, and the explicitly labeled sample report.
+- `src/lib/api.js`: network requests, timeout, and response validation.
+- `src/App.jsx`: shared state and orchestration.
+- `src/index.css`: global tokens and base styles.
+- `src/App.css`: responsive layout and component styles.
 
-Never place AI provider API keys in frontend code or frontend environment variables. Credentials belong in the Python backend.
+Findings expand using native keyboard-accessible disclosure controls. Results are rendered as text, never injected HTML. Reports can be exported as JSON. No scenario history is saved to browser storage.
+
+See [backend handoff](../docs/backend-handoff.md) for the complete contract and backend implementation plan.

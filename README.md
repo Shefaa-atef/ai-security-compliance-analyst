@@ -2,22 +2,18 @@
 
 An AI-powered application for assessing security and compliance scenarios with structured findings, supporting evidence, risk identification, and recommended actions.
 
-## Project status
+## Status
 
-React + Vite frontend initialized with the standard framework starter. The assessment application and Python backend have not been implemented yet.
+The React frontend is implemented, including an explicitly labeled sample report and integration with a defined Python API. The Python backend and real AI assessment workflow remain to be implemented. Sample preview is illustrative and makes no model call.
 
-## Repository structure
+## Structure
 
 ```text
-ai-security-compliance-analyst/
-  frontend/     React user interface
-  backend/      Python API and assessment workflow
-  README.md     Project overview
-  .gitignore    Shared exclusions for local files and secrets
+frontend/     React + Vite interface
+backend/      Python API (implementation pending)
+docs/         Shared API contract and backend handoff
 ```
 
-The frontend and backend live in one Git repository with separate dependencies and configuration. The React interface will call the Python backend over HTTP. AI provider credentials belong only in the backend environment.
+See [frontend setup](frontend/README.md), [backend notes](backend/README.md), and the [backend handoff](docs/backend-handoff.md).
 
-See [frontend setup notes](frontend/README.md) for development commands and [backend setup notes](backend/README.md) for the planned API scope.
-
-Development will proceed through incremental commits. Setup instructions and application screenshots will be added as functionality is implemented.
+Development proceeds through incremental commits. Working application screenshots will be added after end-to-end verification. All assessments require human review and do not constitute deployment approval.
