@@ -16,10 +16,18 @@ uvicorn app.main:app --reload --port 8000
 
 The Vite dev server proxies `/api` to `http://127.0.0.1:8000`, so no frontend configuration is needed locally.
 
-Run the tests (they use a scripted fake model client and need no API key):
+## Testing
+
+Deterministic tests use a scripted fake model client. They need no API key and cover the three supplied use cases, prompt injection, malformed and oversized input, malformed model output, timeouts, refusals, rate limiting and the response contract:
 
 ```bash
 python -m pytest -q
+```
+
+The live check is separate. It sends the three supplied use cases to the real Claude API, so it needs a valid key and costs a small amount. Its results depend on the model:
+
+```bash
+python -m scripts.live_check
 ```
 
 ## API
@@ -29,7 +37,7 @@ python -m pytest -q
 | GET | `/api/health` | Liveness check and whether an AI key is configured |
 | POST | `/api/assess` | Body `{"scenario": "..."}` (20 to 12,000 characters); returns the assessment report |
 
-Error responses: `422` invalid scenario, `429` rate limit exceeded, `503` AI service unavailable or not configured, `500` unexpected error. Error bodies never include provider messages or stack traces.
+Error responses: `422` invalid scenario, `429` rate limit exceeded, `503` AI service unavailable, not configured, timed out or returned an unusable answer, `500` unexpected error. Error bodies look like `{"detail": "...", "request_id": "..."}`. They never echo the input or include provider messages or stack traces. Every response carries an `X-Request-ID` header that matches the audit log.
 
 ## How an assessment works
 
@@ -44,6 +52,21 @@ scenario
   -> audit log            one JSON line per request, scenario stored only as a SHA-256 hash
   -> response             findings, risk, actions, review steps, guardrail notes
 ```
+
+Tool selection is model-driven: the system prompt asks Claude to use the tools, and Claude decides which to call and with which requirement ids. The backend does not depend on that choice for safety. The output guardrails run the risk scan and the requirement checks themselves on every request. The review steps in the response list the tool calls that actually happened.
+
+### Risk rubric
+
+Risk describes potential impact, not how complete the description is. Missing information goes into findings and follow-up questions.
+
+| Level | Meaning |
+| --- | --- |
+| high | Affects employment, finances, legal rights or access to services, or makes automated decisions with personal or financial data |
+| medium | Processes sensitive, personal, confidential or security data, with a person making the decision |
+| low | No sensitive data and no material effect on people or business decisions |
+| unknown | Too vague to judge impact |
+
+The model proposes the level. The deterministic floor described under Guardrails can only raise it.
 
 | File | Responsibility |
 | --- | --- |
@@ -69,7 +92,8 @@ Agent:
 
 - Structured outputs constrain the final answer to the assessment schema. Tools use strict schemas.
 - The risk scan runs on the scenario held by the backend, so the model cannot feed it different text.
-- The loop stops after a fixed number of turns. Tool errors go back to the model instead of crashing the request.
+- The loop stops after a fixed number of turns and a 55-second overall time budget, just under the frontend's 60-second limit. Tool errors go back to the model instead of crashing the request.
+- The prompt limits the assessor to the governance of the system. It must never evaluate or rank individual employees or customers.
 - Requests opt in to Claude's server-side refusal fallback, so a safety-classifier decline is retried on another model before the request fails.
 
 Output:
@@ -95,5 +119,6 @@ Output:
 
 - Rate limiting and the audit log are single-process. A multi-instance deployment would need a shared store.
 - Redaction and risk signals are pattern-based. They reduce risk but do not replace data classification.
+- Prompt-injection detection is a heuristic. It is not a complete defense. The real protection is that the model's output cannot bypass the output guardrails.
 - There is no user authentication. In a real deployment the API would sit behind company SSO.
 - Results are preliminary and are meant to support a human governance reviewer, not replace one.
