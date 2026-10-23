@@ -1,4 +1,6 @@
-from app.input_guardrails import prepare_input
+from app.guardrails.input import prepare_input
+
+ZERO_WIDTH_SPACE = chr(0x200B)
 
 
 def test_clean_scenario_passes_unchanged():
@@ -33,7 +35,7 @@ def test_prompt_injection_is_flagged():
 
 
 def test_hidden_control_characters_are_removed():
-    result = prepare_input("Security​ assistant\x07 for alerts and logs.")
+    result = prepare_input("Security" + ZERO_WIDTH_SPACE + " assistant\x07 for alerts and logs.")
     assert result.text == "Security assistant for alerts and logs."
 
 

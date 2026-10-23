@@ -9,6 +9,8 @@ from app.governance.use_cases import HR_PROMOTIONS
 from app.rate_limit import RateLimiter
 from tests.fakes import FakeClient, final_turn, make_assessment, tool_turn, tool_use
 
+ZERO_WIDTH_SPACE = chr(0x200B)
+
 
 @pytest.fixture
 def api(tmp_path, monkeypatch):
@@ -50,7 +52,7 @@ def test_validation_errors_return_422(api):
     client, _, _ = api
     assert client.post("/api/assess", json={"scenario": "too short"}).status_code == 422
     assert client.post("/api/assess", json={"scenario": "x" * 12_001}).status_code == 422
-    assert client.post("/api/assess", json={"scenario": " " * 30 + "​" * 5}).status_code == 422
+    assert client.post("/api/assess", json={"scenario": " " * 30 + ZERO_WIDTH_SPACE * 5}).status_code == 422
 
 
 def test_ai_failure_returns_503(api):

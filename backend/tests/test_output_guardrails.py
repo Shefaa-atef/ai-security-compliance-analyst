@@ -1,6 +1,6 @@
-from app import output_guardrails
+from app.guardrails import output as output_guardrails
 from app.governance import risk_signals
-from app.governance.use_cases import CUSTOMER_SUPPORT, HR_PROMOTIONS
+from app.governance.use_cases import CUSTOMER_SUPPORT, HR_PROMOTIONS, SECURITY_ASSISTANT
 from app.schemas import Finding
 from tests.fakes import make_assessment, with_finding
 
@@ -18,14 +18,14 @@ def test_invented_quotes_are_removed_and_real_ones_kept():
     f = result.assessment.findings[2]
     assert f.status == "supported"
     assert f.evidence == ["A human support agent will review the generated response before sending it to the customer"]
-    assert result.quotes_removed == 1
+    assert result.corrections.quotes_removed == 1
 
 
 def test_supported_without_evidence_is_downgraded():
     a = with_finding(make_assessment(), "AI-001", status="supported", evidence=["The CISO owns this system."])
     result = run(a, CUSTOMER_SUPPORT.text)
     assert result.assessment.findings[0].status == "needs_clarification"
-    assert any("AI-001" in n for n in result.notes)
+    assert any("AI-001" in n for n in result.corrections.notes)
 
 
 def test_missing_duplicate_and_unknown_findings_are_normalized():
@@ -35,7 +35,7 @@ def test_missing_duplicate_and_unknown_findings_are_normalized():
     result = run(a, CUSTOMER_SUPPORT.text)
     ids = [f.requirement_id for f in result.assessment.findings]
     assert ids == [f"AI-00{i}" for i in range(1, 9)]
-    assert any("did not assess" in n for n in result.notes)
+    assert any("did not assess" in n for n in result.corrections.notes)
 
 
 def test_automated_hr_decision_forces_oversight_gap_and_high_risk():
@@ -62,4 +62,11 @@ def test_third_party_cannot_be_not_applicable():
 def test_risk_is_never_lowered_by_guardrails():
     result = run(make_assessment(risk_level="high"), CUSTOMER_SUPPORT.text)
     assert result.assessment.risk_level == "high"
-    assert not any("Risk level raised" in n for n in result.notes)
+    assert not any("Risk level raised" in n for n in result.corrections.notes)
+
+
+def test_curly_apostrophes_in_quotes_still_verify():
+    curly = "deployed within the organization" + chr(0x2019) + "s cloud environment"
+    a = with_finding(make_assessment(), "AI-005", evidence=[curly])
+    result = run(a, SECURITY_ASSISTANT.text)
+    assert result.assessment.findings[4].evidence == [curly]
