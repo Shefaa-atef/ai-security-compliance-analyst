@@ -44,3 +44,10 @@ def test_hidden_control_characters_are_removed():
 def test_phone_numbers_are_redacted():
     result = prepare_input("Call the owner on +971 50 123 4567 or (555) 123-4567 for approval.")
     assert result.redactions.get("PHONE") == 2
+
+
+def test_google_style_api_keys_are_redacted():
+    fictional_key = "AIza" + "x" * 35
+    result = prepare_input(f"The proposed assistant currently embeds {fictional_key} in its configuration.")
+    assert fictional_key not in result.text
+    assert result.redactions.get("API_KEY") == 1

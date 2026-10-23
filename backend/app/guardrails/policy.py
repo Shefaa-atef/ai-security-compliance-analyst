@@ -4,6 +4,8 @@ Each rule looks at the deterministic risk signals, not at the model's opinion,
 and can only make the assessment stricter.
 """
 
+import re
+
 from ..governance import risk_signals
 from ..schemas import Finding, RiskLevel
 from .corrections import Corrections
@@ -61,3 +63,32 @@ def enforce_high_risk_review(
             "AI-008 changed to needs clarification: high-risk use cases require an additional review. "
             "The finding does not establish that an applicable review has been completed.",
         )
+
+
+_EXPLICIT_GAP = {
+    "AI-002": re.compile(
+        r"\b(?:without|no|not|lack\w*)\b[^.!?]{0,60}"
+        r"\b(?:controls?|protect\w*|encrypt\w*|redact\w*|consent|safeguards?)\b"
+        r"|\b(?:unencrypted|unprotected|unredacted|publicly accessible)\b",
+        re.I,
+    ),
+    "AI-006": re.compile(
+        r"\b(?:without|no|not|lack\w*|skip\w*|bypass\w*)\b[^.!?]{0,60}"
+        r"\b(?:assess\w*|review\w*|vet\w*|approv\w*)\b"
+        r"|\b(?:assess\w*|review\w*)\b[^.!?]{0,20}\b(?:not|never|skipped|bypassed)\b",
+        re.I,
+    ),
+}
+
+
+def enforce_missing_control_uncertainty(findings: dict[str, Finding], corrections: Corrections) -> None:
+    """Sensitive processing or vendor use alone does not prove a control violation."""
+    for requirement_id, pattern in _EXPLICIT_GAP.items():
+        finding = findings[requirement_id]
+        if finding.status == "gap" and not any(pattern.search(quote) for quote in finding.evidence):
+            corrections.change_status(
+                finding,
+                "needs_clarification",
+                f"{requirement_id}: the cited evidence does not explicitly establish a control failure. "
+                "Confirm the controls rather than treating an omitted description as a violation.",
+            )

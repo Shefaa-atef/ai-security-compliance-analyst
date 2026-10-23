@@ -22,7 +22,7 @@ _REDACTIONS: tuple[tuple[str, re.Pattern], ...] = (
         "API_KEY",
         re.compile(
             r"\b(?:sk-[A-Za-z0-9_\-]{16,}|AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{30,}"
-            r"|xox[baprs]-[A-Za-z0-9\-]{10,})\b"
+            r"|xox[baprs]-[A-Za-z0-9\-]{10,}|AIza[0-9A-Za-z_\-]{30,})\b"
         ),
     ),
     ("CREDENTIAL", re.compile(r"(?i)\b(password|passwd|pwd|secret|token|api[_ ]?key)\b\s*[:=]\s*\S+")),

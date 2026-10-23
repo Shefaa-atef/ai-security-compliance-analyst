@@ -33,6 +33,7 @@ def apply(assessment: AgentAssessment, scenario: str, signals: dict) -> Guardrai
     by_id = {finding.requirement_id: finding for finding in findings}
     policy.enforce_human_oversight(by_id, signals, corrections)
     policy.enforce_third_party_review(by_id, signals, corrections)
+    policy.enforce_missing_control_uncertainty(by_id, corrections)
     risk_level, risk_rationale = policy.apply_risk_floor(
         assessment.risk_level,
         _text_or(assessment.risk_rationale, "No rationale was provided."),

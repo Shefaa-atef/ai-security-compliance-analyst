@@ -21,6 +21,9 @@ Return exactly one finding for each of the eight requirements, in catalog order:
 - not_applicable: the requirement clearly does not apply (for example, no third party is involved).
 A missing description is not proof of a violation: prefer needs_clarification over gap unless the \
 scenario itself conflicts with the requirement.
+For AI-002, processing sensitive data with no control description means needs_clarification, not gap.
+For AI-006, using a third-party service with no assessment description means needs_clarification, not gap.
+Only cite an explicit statement of an absent or unsafe control to confirm a gap for these requirements.
 
 Risk level reflects potential impact if the system fails or is misused, not how complete the \
 description is:

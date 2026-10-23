@@ -80,3 +80,27 @@ def test_corrected_finding_does_not_claim_the_original_control_is_supported():
 def test_no_human_resources_data_is_not_a_signal_of_automated_decisions():
     signals = risk_signals.scan("This assistant handles security alerts and no human resources data.")
     assert "automated_decision" not in signals
+
+
+def test_sensitive_processing_alone_is_not_a_proven_control_violation():
+    scenario = "The assistant processes customer names and account information."
+    assessment = with_finding(make_assessment(), "AI-002", status="gap", evidence=[scenario])
+    assert assess(scenario, assessment).findings[1].status == "needs_clarification"
+
+
+def test_vendor_use_alone_does_not_prove_no_security_review():
+    scenario = "The assistant uses a third-party hosted LLM API."
+    assessment = with_finding(make_assessment(), "AI-006", status="gap", evidence=[scenario])
+    assert assess(scenario, assessment).findings[5].status == "needs_clarification"
+
+
+def test_explicit_control_failure_remains_a_gap():
+    scenario = (
+        "Sensitive customer information is sent unencrypted. No vendor security assessment is performed."
+    )
+    assessment = with_finding(make_assessment(), "AI-002", status="gap", evidence=["sent unencrypted"])
+    assessment = with_finding(
+        assessment, "AI-006", status="gap", evidence=["No vendor security assessment is performed"]
+    )
+    result = assess(scenario, assessment)
+    assert result.findings[1].status == result.findings[5].status == "gap"
