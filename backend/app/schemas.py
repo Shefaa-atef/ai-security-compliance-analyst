@@ -4,6 +4,7 @@
 structured-output schema). `AssessmentResponse` is what the API returns after
 guardrails run; it matches the contract in frontend/src/lib/api.js.
 """
+
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
@@ -28,7 +29,12 @@ class AssessmentRequest(BaseModel):
 class Finding(BaseModel):
     requirement_id: str
     status: Status
-    evidence: list[str] = Field(description="Verbatim quotes copied from the scenario. Empty if nothing in the scenario addresses the requirement.")
+    evidence: list[str] = Field(
+        description=(
+            "Verbatim quotes copied from the scenario. "
+            "Empty if nothing in the scenario addresses the requirement."
+        )
+    )
     explanation: str
     recommendation: str
 

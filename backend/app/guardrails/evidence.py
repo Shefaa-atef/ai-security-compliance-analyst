@@ -3,6 +3,7 @@
 These make the report traceable: every requirement is answered once, and every
 quote shown as evidence really appears in the scenario.
 """
+
 import re
 
 from ..governance.catalog import REQUIREMENT_IDS

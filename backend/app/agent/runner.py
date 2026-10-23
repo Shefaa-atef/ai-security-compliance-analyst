@@ -5,6 +5,7 @@ either calls tools, whose results are sent back, or returns the final
 assessment, which structured outputs force to match `AgentAssessment`. The
 loop is bounded by a turn limit and an overall time budget.
 """
+
 import json
 import logging
 import time
@@ -61,7 +62,9 @@ class AssessmentAgent:
             if response.stop_reason == "tool_use":
                 # Append the full content so thinking blocks are passed back unchanged.
                 messages.append({"role": "assistant", "content": response.content})
-                messages.append({"role": "user", "content": self._run_tools(response.content, scenario, tool_calls)})
+                messages.append(
+                    {"role": "user", "content": self._run_tools(response.content, scenario, tool_calls)}
+                )
                 continue
 
             if response.parsed_output is None:
@@ -88,7 +91,9 @@ class AssessmentAgent:
             )
         except (anthropic.APIConnectionError, anthropic.APIStatusError) as exc:
             # Log the error type and status only; provider messages may echo request content.
-            log.warning("Claude API call failed: %s status=%s", type(exc).__name__, getattr(exc, "status_code", None))
+            log.warning(
+                "Claude API call failed: %s status=%s", type(exc).__name__, getattr(exc, "status_code", None)
+            )
             raise AssessmentUnavailable("AI provider request failed") from exc
 
         if response.stop_reason == "refusal":
@@ -109,10 +114,12 @@ class AssessmentAgent:
             except Exception as exc:  # report tool failures to the model instead of failing the request
                 output, is_error = {"error": str(exc)}, True
             tool_calls.append({"tool": block.name, "input": block.input, "is_error": is_error})
-            results.append({
-                "type": "tool_result",
-                "tool_use_id": block.id,
-                "content": json.dumps(output),
-                "is_error": is_error,
-            })
+            results.append(
+                {
+                    "type": "tool_result",
+                    "tool_use_id": block.id,
+                    "content": json.dumps(output),
+                    "is_error": is_error,
+                }
+            )
         return results

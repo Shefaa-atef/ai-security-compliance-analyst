@@ -4,6 +4,7 @@ Used two ways: the agent calls it as a tool to ground its reasoning, and the
 output guardrails use it to enforce minimum risk levels the model cannot
 talk its way below.
 """
+
 import re
 
 _SIGNALS: dict[str, tuple[str, str]] = {
@@ -26,11 +27,13 @@ _SIGNALS: dict[str, tuple[str, str]] = {
     ),
     "automated_decision": (
         "AI output drives a decision with little or no human judgment",
-        r"automatic(ally)?|primary input|without (human )?review|no human|auto-?(approve|reject)|fully automated",
+        r"automatic(ally)?|primary input|without (human )?review|no human"
+        r"|auto-?(approve|reject)|fully automated",
     ),
     "human_review": (
         "A person reviews AI output before it is used",
-        r"(human|agent|analyst|person|staff|reviewer)s?\b.{0,40}\breview|review.{0,40}before (sending|taking|use|acting)",
+        r"(human|agent|analyst|person|staff|reviewer)s?\b.{0,40}\breview"
+        r"|review.{0,40}before (sending|taking|use|acting)",
     ),
     "third_party": (
         "A third-party model, API or external service is used",

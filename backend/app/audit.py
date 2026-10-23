@@ -4,6 +4,7 @@ Records what happened for every assessment without storing the scenario text
 itself: a SHA-256 hash lets an auditor match a log entry to a submission while
 keeping potentially sensitive content out of the logs.
 """
+
 import hashlib
 import json
 import logging

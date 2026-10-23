@@ -2,6 +2,7 @@
 
 Shared by the tests and the live check so the wording is defined once.
 """
+
 from dataclasses import dataclass
 
 

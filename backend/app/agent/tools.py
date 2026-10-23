@@ -4,6 +4,7 @@ All tools are read-only and local: they look up the requirement catalog or
 scan the scenario the backend already holds. Nothing reaches the network or
 runs user-supplied code.
 """
+
 from ..governance import catalog, risk_signals
 
 _NO_ARGS = {"type": "object", "properties": {}, "required": [], "additionalProperties": False}

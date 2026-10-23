@@ -1,4 +1,5 @@
 """Records every change the output guardrails make, so each one can be shown to the user."""
+
 from dataclasses import dataclass, field
 
 from ..schemas import Finding, Status

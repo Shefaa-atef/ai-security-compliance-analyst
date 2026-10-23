@@ -4,6 +4,7 @@ The model's output is never trusted as-is. Evidence checks make the report
 traceable, and policy rules stop the model from rating a use case more
 leniently than policy allows. Every correction is reported back to the user.
 """
+
 from dataclasses import dataclass
 
 from ..schemas import AgentAssessment
