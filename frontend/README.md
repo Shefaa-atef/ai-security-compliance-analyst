@@ -33,7 +33,7 @@ Vite proxies `/api` to `http://127.0.0.1:8000`. To use another backend, copy `.e
 
 Findings expand using native keyboard-accessible disclosure controls. Results are rendered as text, never injected HTML. Reports can be exported as JSON. No scenario history is saved to browser storage.
 
-See [backend handoff](../docs/backend-handoff.md) for the complete contract and backend implementation plan.
+See the [backend API documentation](../backend/README.md) for the contract and the [architecture walkthrough](../docs/architecture.md) for the complete request flow.
 
 ## Languages
 

@@ -100,6 +100,6 @@ backend/app/              API, agent workflow, governance, and guardrails
 backend/tests/            Deterministic backend tests
 ```
 
-See [frontend setup](frontend/README.md), [backend setup and limitations](backend/README.md), [localization](docs/frontend-localization.md), and the [original API handoff](docs/backend-handoff.md). The backend code and its current schemas are the implementation reference; the handoff records the agreed initial contract.
+See the [architecture walkthrough](docs/architecture.md), [frontend setup](frontend/README.md), [backend setup and API](backend/README.md), and [localization guide](docs/frontend-localization.md). The code and schemas are the implementation reference.
 
 Development is recorded through incremental commits. This is a local assessment prototype: it has no user authentication, relies on heuristic signal detection and redaction, and needs deployment controls before organizational use. Review the backend limitations before using real information. No repository changes should be made after final submission.
