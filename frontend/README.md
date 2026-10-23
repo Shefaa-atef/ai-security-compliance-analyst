@@ -1,11 +1,29 @@
 # Frontend
 
-This folder will contain the React user interface.
+React with Vite, using JavaScript and the standard React starter.
 
-Planned responsibilities:
+## Local development
 
-- Accept a security or compliance scenario.
-- Send assessment requests to the Python backend.
-- Display structured findings, evidence, gaps, and recommended actions.
+Use Node.js 24 LTS and npm. From this folder:
 
-The React project and its dependencies have not been initialized yet. Keep frontend dependencies and configuration in this folder. Never place AI provider API keys in frontend code or frontend environment variables.
+```powershell
+npm install
+npm run dev
+```
+
+Open the local URL printed by Vite.
+
+## Checks
+
+```powershell
+npm run lint
+npm run build
+```
+
+Run `npm run preview` to preview the production build locally.
+
+## Scope
+
+Only the framework starter is initialized. Scenario input, assessment results, and Python API integration will be implemented in subsequent steps.
+
+Never place AI provider API keys in frontend code or frontend environment variables. Credentials belong in the Python backend.
