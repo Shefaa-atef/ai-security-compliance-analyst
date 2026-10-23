@@ -1,4 +1,5 @@
 """A scripted stand-in for the Anthropic client so the workflow can be tested offline."""
+
 from types import SimpleNamespace
 
 from app.governance.catalog import REQUIREMENT_IDS
@@ -10,7 +11,9 @@ def tool_use(name: str, tool_id: str, args: dict | None = None):
 
 
 def tool_turn(*blocks):
-    return SimpleNamespace(stop_reason="tool_use", content=list(blocks), parsed_output=None, model="fake-model")
+    return SimpleNamespace(
+        stop_reason="tool_use", content=list(blocks), parsed_output=None, model="fake-model"
+    )
 
 
 def final_turn(assessment: AgentAssessment):
@@ -19,8 +22,13 @@ def final_turn(assessment: AgentAssessment):
 
 def make_assessment(**overrides) -> AgentAssessment:
     findings = [
-        Finding(requirement_id=rid, status="needs_clarification", evidence=[],
-                explanation="Not described.", recommendation="Document this control.")
+        Finding(
+            requirement_id=rid,
+            status="needs_clarification",
+            evidence=[],
+            explanation="Not described.",
+            recommendation="Document this control.",
+        )
         for rid in REQUIREMENT_IDS
     ]
     data = dict(
@@ -58,3 +66,8 @@ class FakeClient:
         if isinstance(item, Exception):
             raise item
         return item
+
+
+def stop_turn(stop_reason: str):
+    """A final turn with no usable assessment, such as a refusal or truncation."""
+    return SimpleNamespace(stop_reason=stop_reason, content=[], parsed_output=None, model="fake-model")

@@ -6,33 +6,33 @@ model. Run from the backend folder:
 
     python -m scripts.live_check
 """
+
 import sys
 import time
 
-from app import service
-from app.governance.use_cases import CUSTOMER_SUPPORT, HR_PROMOTIONS, SECURITY_ASSISTANT
-from app.main import get_agent
-
-CASES = {
-    "A - Customer support": CUSTOMER_SUPPORT.text,
-    "B - Security assistant": SECURITY_ASSISTANT.text,
-    "C - HR promotions": HR_PROMOTIONS.text,
-}
+from app import pipeline
+from app.agent import AssessmentUnavailable
+from app.api.dependencies import get_agent
+from app.config import get_settings
+from app.governance.use_cases import USE_CASES
 
 
 def main() -> int:
+    agent = get_agent(get_settings())
     failures = 0
-    for name, scenario in CASES.items():
+    for use_case in USE_CASES:
+        label = f"Use case {use_case.id}: {use_case.title}"
         started = time.monotonic()
         try:
-            result = service.assess(scenario, get_agent(), "logs/live_check.jsonl")
-        except Exception as exc:  # report and continue with the next case
+            result = pipeline.assess(use_case.text, agent, "logs/live_check.jsonl")
+        except AssessmentUnavailable as exc:
             failures += 1
-            print(f"\n{name}: FAILED ({type(exc).__name__})")
+            print(f"\n{label}: FAILED ({exc})")
             continue
-        print(f"\n{name}: risk={result.risk_level} in {time.monotonic() - started:.1f}s via {result.model}")
-        for f in result.findings:
-            print(f"  {f.requirement_id} {f.status:<20} evidence={len(f.evidence)}")
+
+        print(f"\n{label}: risk={result.risk_level} in {time.monotonic() - started:.1f}s via {result.model}")
+        for finding in result.findings:
+            print(f"  {finding.requirement_id} {finding.status:<20} evidence={len(finding.evidence)}")
         for note in result.guardrail_notes:
             print(f"  guardrail: {note}")
     return 1 if failures else 0

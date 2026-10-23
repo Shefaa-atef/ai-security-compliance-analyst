@@ -1,6 +1,6 @@
-from app.guardrails import output as output_guardrails
 from app.governance import risk_signals
 from app.governance.use_cases import CUSTOMER_SUPPORT, HR_PROMOTIONS, SECURITY_ASSISTANT
+from app.guardrails import output as output_guardrails
 from app.schemas import Finding
 from tests.fakes import make_assessment, with_finding
 
@@ -10,14 +10,21 @@ def run(assessment, scenario):
 
 
 def test_invented_quotes_are_removed_and_real_ones_kept():
-    a = with_finding(make_assessment(), "AI-003", status="supported", evidence=[
-        "A human support agent will review the generated response before sending it to the customer.",
-        "All responses are approved by a compliance officer.",
-    ])
+    a = with_finding(
+        make_assessment(),
+        "AI-003",
+        status="supported",
+        evidence=[
+            "A human support agent will review the generated response before sending it to the customer.",
+            "All responses are approved by a compliance officer.",
+        ],
+    )
     result = run(a, CUSTOMER_SUPPORT.text)
     f = result.assessment.findings[2]
     assert f.status == "supported"
-    assert f.evidence == ["A human support agent will review the generated response before sending it to the customer"]
+    assert f.evidence == [
+        "A human support agent will review the generated response before sending it to the customer"
+    ]
     assert result.corrections.quotes_removed == 1
 
 
@@ -30,8 +37,11 @@ def test_supported_without_evidence_is_downgraded():
 
 def test_missing_duplicate_and_unknown_findings_are_normalized():
     a = make_assessment()
-    a.findings = [a.findings[1], a.findings[1], Finding(
-        requirement_id="AI-999", status="gap", evidence=[], explanation="x", recommendation="y")]
+    a.findings = [
+        a.findings[1],
+        a.findings[1],
+        Finding(requirement_id="AI-999", status="gap", evidence=[], explanation="x", recommendation="y"),
+    ]
     result = run(a, CUSTOMER_SUPPORT.text)
     ids = [f.requirement_id for f in result.assessment.findings]
     assert ids == [f"AI-00{i}" for i in range(1, 9)]
@@ -47,8 +57,14 @@ def test_automated_hr_decision_forces_oversight_gap_and_high_risk():
 
 
 def test_human_review_scenario_is_not_forced_to_gap():
-    a = with_finding(make_assessment(), "AI-003", status="supported", evidence=[
-        "A human support agent will review the generated response before sending it to the customer."])
+    a = with_finding(
+        make_assessment(),
+        "AI-003",
+        status="supported",
+        evidence=[
+            "A human support agent will review the generated response before sending it to the customer."
+        ],
+    )
     result = run(a, CUSTOMER_SUPPORT.text)
     assert result.assessment.findings[2].status == "supported"
 
