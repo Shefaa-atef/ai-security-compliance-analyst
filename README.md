@@ -4,6 +4,20 @@ An AI-powered application for assessing security and compliance scenarios with s
 
 ## Project status
 
-Repository initialized. Application implementation has not started.
+Repository structure prepared. Application implementation has not started.
+
+## Repository structure
+
+```text
+ai-security-compliance-analyst/
+  frontend/     React user interface
+  backend/      Python API and assessment workflow
+  README.md     Project overview
+  .gitignore    Shared exclusions for local files and secrets
+```
+
+The frontend and backend live in one Git repository with separate dependencies and configuration. The React interface will call the Python backend over HTTP. AI provider credentials belong only in the backend environment.
+
+See [frontend setup notes](frontend/README.md) and [backend setup notes](backend/README.md). Framework scaffolding and dependency installation will follow in the implementation steps.
 
 Development will proceed through incremental commits. Setup instructions and application screenshots will be added as functionality is implemented.
