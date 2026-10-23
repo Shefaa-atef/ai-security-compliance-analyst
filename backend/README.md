@@ -2,11 +2,11 @@
 
 FastAPI service that assesses a proposed AI use case against Acme Financial Services' eight governance requirements (AI-001 to AI-008).
 
-A Claude agent drafts the assessment using local tools. Deterministic guardrails then check the draft before anything reaches the user.
+A Gemini or Claude agent drafts the assessment using local tools. Deterministic guardrails then check the draft before anything reaches the user.
 
 ## Quick start
 
-Requires Python 3.11 or later and an Anthropic API key.
+Requires Python 3.11 or later and a Gemini API key (or an Anthropic key for the optional Claude adapter).
 
 ```bash
 cd backend
@@ -14,7 +14,7 @@ python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements-dev.txt
 cp .env.example .env             # Windows: copy .env.example .env
-# Set ANTHROPIC_API_KEY in .env
+# Set AI_PROVIDER=gemini and GEMINI_API_KEY in .env
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -61,7 +61,7 @@ Example response, abbreviated and illustrative:
     "Output guardrails: 4 evidence quote(s) verified against the scenario, 0 removed, 1 status change(s)."
   ],
   "guardrail_notes": ["AI-003 changed to gap: the AI output drives decisions and no human review is described."],
-  "model": "claude-opus-5-5"
+  "model": "gemini-3.5-flash-lite"
 }
 ```
 
@@ -81,7 +81,7 @@ Errors return `{"detail": "...", "request_id": "..."}` and never echo the scenar
 ```text
 scenario
   1. input guardrails    strip invisible characters, redact secrets and personal data, flag injection
-  2. Claude agent        calls local tools, then returns JSON that must match the schema
+  2. AI agent            calls local tools, then returns JSON that must match the schema
                            list_requirements          requirement catalog
                            get_requirement_guidance   what satisfies each control, what signals a gap
                            scan_risk_signals          data types, third parties, automation, impact
@@ -90,7 +90,7 @@ scenario
   5. response            findings, risk, actions, review steps and guardrail notes
 ```
 
-Claude decides which tools to call. Safety does not depend on that choice, because step 3 runs the risk scan and every rule itself. The review steps come from the backend and list the tool calls that actually happened.
+The selected model decides which local tools to call. The Gemini adapter requires successful catalog, guidance, and risk-scan tool calls before accepting the final assessment. Safety does not depend on that choice, because step 3 runs the risk scan and every rule itself. The review steps come from the backend and list the tool calls that actually happened.
 
 ### Guardrails
 
@@ -101,7 +101,7 @@ Claude decides which tools to call. Safety does not depend on that choice, becau
 | Input | Flags prompt-injection phrases. The scenario is always sent inside `<scenario>` tags as data |
 | Agent | Structured outputs and strict tool schemas. Read-only local tools only |
 | Agent | Turn limit and a 55-second time budget, under the frontend's 60-second limit |
-| Agent | Server-side refusal fallback, so a safety-classifier decline is retried on another model |
+| Agent | Anthropic-only refusal fallback is explicitly requested; Gemini has no provider fallback |
 | Output | Evidence quotes must appear verbatim in the scenario, otherwise they are removed |
 | Output | A requirement cannot be `supported` without verified evidence |
 | Output | Automated decisions without described human review are always an AI-003 gap |
@@ -154,7 +154,10 @@ The deterministic tests script the model's replies. They cover the agent loop, a
 
 | Variable | Default | Notes |
 | --- | --- | --- |
-| `ANTHROPIC_API_KEY` | none | Required. Keep it in `backend/.env` only |
+| `AI_PROVIDER` | `anthropic` in code; `gemini` in the example | Selects `gemini` or `anthropic` |
+| `GEMINI_API_KEY` | none | Required when using Gemini; backend only |
+| `GEMINI_MODEL` | `gemini-flash-lite-latest` | Tested alias; actual returned model is recorded |
+| `ANTHROPIC_API_KEY` | none | Required only for the Anthropic adapter |
 | `ANTHROPIC_MODEL` | `claude-opus-5-5` | Claude model used by the agent |
 | `ALLOWED_ORIGINS` | `http://localhost:5173,http://127.0.0.1:5173` | CORS allow-list |
 | `RATE_LIMIT_PER_MINUTE` | `10` | Per client address |
@@ -176,3 +179,14 @@ Evidence matching tolerates differences in case, whitespace, and quote style, bu
 A changed finding status also replaces the original explanation and recommendation so contradictory model conclusions are not retained. Vague scenarios can remain `unknown` risk. Automatic summarization alone is not classified as an automated business decision. Explicitly negated human review is not counted as an oversight control. High-risk review cannot be marked inapplicable merely because an unrelated quote is present.
 
 The deterministic risk and injection patterns are primarily English. Arabic UI localization does not imply equivalent Arabic heuristic coverage. Use the supplied English examples for the assessed workflow and review other-language results carefully.
+
+
+### Gemini implementation
+
+The Google GenAI SDK executes a bounded, manually controlled function-calling loop. Automatic SDK tool execution is disabled. Tools are local and read-only; the model cannot replace the scenario passed to the risk scan. A final `submit_assessment` function with a Pydantic-derived JSON schema is made available only after all three context tools have succeeded. The resulting arguments are validated again before the shared output guardrails run. SDK retries are disabled so the adapter can enforce the request budget. The Gemini adapter has no provider or mock fallback.
+
+Implementation references: [Google function calling](https://ai.google.dev/gemini-api/docs/generate-content/function-calling) and [Google structured output schemas](https://ai.google.dev/gemini-api/docs/structured-output). The model alias is configurable; live reports record the resolved model version when supplied by the API.
+
+### Observed live verification
+
+On 2026-10-23, all three fictional use cases completed with the Gemini adapter and returned eight findings, verified evidence, recommended actions, and an actual tool-use trail. The observed model was `gemini-3.5-flash-lite`: A and B were medium risk with human oversight supported; C was high risk with an oversight gap. Results are model-dependent, not golden expected outputs. No real customer or employee information was used.

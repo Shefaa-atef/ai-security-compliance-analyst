@@ -27,3 +27,7 @@ coverage/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Local browser verification artifacts
+.playwright-cli/
+output/playwright/

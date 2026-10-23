@@ -13,7 +13,7 @@ cd backend
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 Copy-Item .env.example .env
-# Set ANTHROPIC_API_KEY in backend/.env; never commit this file.
+# Set GEMINI_API_KEY in backend/.env; keep AI_PROVIDER=gemini. Never commit .env.
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
 ```
 
@@ -65,11 +65,27 @@ cd backend
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-The deterministic backend tests use a fake model. Passing them does not prove live model availability or quality. For the separate real-provider check, configure the backend key and run `python -m scripts.live_check` from `backend/`. This sends the three fictional scenarios to the configured provider.
+The backend test suite contains 58 deterministic tests, and the frontend suite contains 9 tests. The deterministic backend tests use a fake model. Passing them does not prove live model availability or quality. For the separate real-provider check, configure the backend key and run `python -m scripts.live_check` from `backend/`. This sends the three fictional scenarios to the configured provider.
 
-## Screenshots and verification status
+## Screenshots and verification
 
-Real browser screenshots of the working application still need to be captured and added here. Do not treat the sample preview or a mocked provider test as evidence of a live AI assessment. Browser visual review, a live-provider assessment, and final end-to-end checks remain required before submission.
+Live Gemini assessments of all three fictional scenarios completed on 2026-10-23. A and B returned medium risk with human oversight supported; C returned high risk with an oversight gap. A real browser request also completed through React, Vite's proxy, FastAPI, the model tool-use loop, output guardrails, and the rendered report. Live results can vary; these observations are not a substitute for human review.
+
+Desktop live AI assessment, with the actual review activity expanded:
+
+![Live AI assessment in the desktop interface](docs/screenshots/live-assessment-desktop.png)
+
+[View the live employee-decision assessment with expanded oversight evidence](docs/screenshots/live-employee-review.png).
+
+Illustrative sample preview on desktop (no model call):
+
+![Fixed sample report on desktop](docs/screenshots/sample-desktop.png)
+
+Arabic sample preview on a 390-pixel mobile viewport (no model call):
+
+<img src="docs/screenshots/sample-arabic-mobile.png" width="390" alt="Arabic sample report on mobile with right-to-left layout" />
+
+Browser checks confirmed a one-line desktop title at 1440 pixels, no horizontal overflow at 390 pixels in Arabic, and no browser console errors during the assessment flow. Screenshots were captured from the running application; sample previews are explicitly labeled in the UI.
 
 ## Structure and notes
 
