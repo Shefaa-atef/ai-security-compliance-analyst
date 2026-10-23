@@ -17,5 +17,10 @@ class Corrections:
 
     def change_status(self, finding: Finding, status: Status, reason: str) -> None:
         finding.status = status
+        # A changed status must not retain a contradictory model explanation.
+        finding.explanation = reason
+        finding.recommendation = (
+            "Confirm this requirement with a governance reviewer and document the supporting controls."
+        )
         self.status_changes += 1
         self.notes.append(reason)

@@ -52,10 +52,12 @@ def enforce_high_risk_review(
 ) -> None:
     """AI-008: a high-risk use case needs evidence of an additional review."""
     review = findings["AI-008"]
-    if level == "high" and review.status in ("supported", "not_applicable") and not review.evidence:
+    if level == "high" and (
+        review.status == "not_applicable" or (review.status == "supported" and not review.evidence)
+    ):
         corrections.change_status(
             review,
             "needs_clarification",
-            "AI-008 changed to needs clarification: the use case is high risk and no completed review "
-            "is described.",
+            "AI-008 changed to needs clarification: high-risk use cases require an additional review. "
+            "The finding does not establish that an applicable review has been completed.",
         )

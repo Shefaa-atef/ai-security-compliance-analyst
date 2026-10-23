@@ -41,14 +41,19 @@ def complete_findings(findings: list[Finding], corrections: Corrections) -> list
 
 def verify_quotes(findings: list[Finding], scenario: str, corrections: Corrections) -> None:
     """Keep only quotes that appear verbatim in the scenario."""
-    source = _normalize(scenario)
+    source, positions = _indexed_normalize(scenario)
     removed = 0
     for finding in findings:
         verified: list[str] = []
         for quote in finding.evidence:
             cleaned = _clean_quote(quote)[:MAX_QUOTE_CHARS]
-            if cleaned and _normalize(cleaned) in source and cleaned not in verified:
-                verified.append(cleaned)
+            normalized = _normalize(cleaned)
+            start = source.find(normalized) if normalized else -1
+            if start >= 0:
+                # Match tolerantly, but return the original source characters unchanged.
+                original = scenario[positions[start][0] : positions[start + len(normalized) - 1][1]]
+                if original not in verified:
+                    verified.append(original)
             else:
                 removed += 1
         finding.evidence = verified[:MAX_QUOTES_PER_FINDING]
@@ -80,3 +85,24 @@ def _normalize(text: str) -> str:
 
 def _clean_quote(quote: str) -> str:
     return quote.strip().strip("\"'").strip().rstrip(".,;:").strip()
+
+
+def _indexed_normalize(text: str) -> tuple[str, list[tuple[int, int]]]:
+    """Normalize for matching while retaining offsets into the exact source text."""
+    chars: list[str] = []
+    positions: list[tuple[int, int]] = []
+    for index, char in enumerate(text):
+        if char.isspace():
+            if chars and chars[-1] == " ":
+                positions[-1] = (positions[-1][0], index + 1)
+            elif chars:
+                chars.append(" ")
+                positions.append((index, index + 1))
+            continue
+        for folded in char.translate(_QUOTE_FOLDING).lower():
+            chars.append(folded)
+            positions.append((index, index + 1))
+    if chars and chars[-1] == " ":
+        chars.pop()
+        positions.pop()
+    return "".join(chars), positions

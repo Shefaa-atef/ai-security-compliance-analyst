@@ -167,3 +167,12 @@ The deterministic tests script the model's replies. They cover the agent loop, a
 - There is no user authentication. A real deployment would sit behind company SSO.
 - Reports are in English, even when the interface is in Arabic.
 - Results are preliminary and support a human governance reviewer. They are not deployment approval.
+
+
+### Evidence and risk review notes
+
+Evidence matching tolerates differences in case, whitespace, and quote style, but returned excerpts are copied from the actual sanitized scenario text. This verifies that a quote exists; it does not prove that the quote semantically satisfies a control. A governance reviewer must confirm relevance.
+
+A changed finding status also replaces the original explanation and recommendation so contradictory model conclusions are not retained. Vague scenarios can remain `unknown` risk. Automatic summarization alone is not classified as an automated business decision. Explicitly negated human review is not counted as an oversight control. High-risk review cannot be marked inapplicable merely because an unrelated quote is present.
+
+The deterministic risk and injection patterns are primarily English. Arabic UI localization does not imply equivalent Arabic heuristic coverage. Use the supplied English examples for the assessed workflow and review other-language results carefully.

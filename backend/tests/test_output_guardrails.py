@@ -85,4 +85,4 @@ def test_curly_apostrophes_in_quotes_still_verify():
     curly = "deployed within the organization" + chr(0x2019) + "s cloud environment"
     a = with_finding(make_assessment(), "AI-005", evidence=[curly])
     result = run(a, SECURITY_ASSISTANT.text)
-    assert result.assessment.findings[4].evidence == [curly]
+    assert result.assessment.findings[4].evidence == ["deployed within the organization's cloud environment"]

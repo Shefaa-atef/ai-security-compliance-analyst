@@ -12,6 +12,7 @@ import time
 from dataclasses import dataclass, field
 
 import anthropic
+from pydantic import ValidationError
 
 from ..schemas import AgentAssessment
 from .prompt import SYSTEM_PROMPT, user_message
@@ -89,7 +90,12 @@ class AssessmentAgent:
                 extra_headers={"anthropic-beta": "server-side-fallback-2026-07-01"},
                 extra_body={"fallbacks": "default"},
             )
-        except (anthropic.APIConnectionError, anthropic.APIStatusError) as exc:
+        except (
+            anthropic.APIConnectionError,
+            anthropic.APIStatusError,
+            anthropic.APIResponseValidationError,
+            ValidationError,
+        ) as exc:
             # Log the error type and status only; provider messages may echo request content.
             log.warning(
                 "Claude API call failed: %s status=%s", type(exc).__name__, getattr(exc, "status_code", None)

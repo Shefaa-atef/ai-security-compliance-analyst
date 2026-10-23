@@ -27,13 +27,21 @@ _SIGNALS: dict[str, tuple[str, str]] = {
     ),
     "automated_decision": (
         "AI output drives a decision with little or no human judgment",
-        r"automatic(ally)?|primary input|without (human )?review|no human"
+        r"automatic(?:ally)?\s+(?:recommend|decid|approv|reject|select|rank)"
+        r"|automated\s+decisions?|primary input|without (human )?review"
+        r"|no human (?:review|oversight|intervention)"
         r"|auto-?(approve|reject)|fully automated",
     ),
     "human_review": (
         "A person reviews AI output before it is used",
         r"(human|agent|analyst|person|staff|reviewer)s?\b.{0,40}\breview"
         r"|review.{0,40}before (sending|taking|use|acting)",
+    ),
+    "no_human_review": (
+        "The scenario explicitly denies human review",
+        r"\b(?:no|without)\s+(?:a\s+)?(?:human|manual|analyst|staff)\s+review\b"
+        r"|\b(?:human|analyst|staff|person)s?\b.{0,20}"
+        r"\b(?:will not|does not|do not|never|won't)\b.{0,15}\breview\b",
     ),
     "third_party": (
         "A third-party model, API or external service is used",
@@ -55,6 +63,8 @@ def scan(text: str) -> dict[str, dict]:
     for key, pattern in _COMPILED.items():
         if match := pattern.search(text):
             found[key] = {"description": _SIGNALS[key][0], "matched_text": match.group(0)}
+    if "no_human_review" in found:
+        found.pop("human_review", None)
     return found
 
 
@@ -66,7 +76,7 @@ def risk_floor(signals: dict) -> tuple[str, str | None]:
         return "high", "Automated decisions that use personal or financial data are treated as high risk."
     if {"personal_data", "financial_data", "security_data"} & signals.keys():
         return "medium", "Sensitive data is processed, so the risk cannot be rated low."
-    return "low", None
+    return "unknown", None
 
 
 def at_least(level: str, floor: str) -> bool:

@@ -77,3 +77,16 @@ def test_time_budget_stops_the_agent_before_calling_the_model():
     with pytest.raises(AssessmentUnavailable):
         AssessmentAgent(client, "m", deadline_seconds=0).run(HR_PROMOTIONS.text)
     assert client.requests == []
+
+
+def test_provider_schema_validation_error_is_a_safe_unavailable_result():
+    from pydantic import ValidationError
+
+    from app.schemas import AgentAssessment
+
+    try:
+        AgentAssessment.model_validate({})
+    except ValidationError as exc:
+        invalid_output = exc
+    with pytest.raises(AssessmentUnavailable):
+        AssessmentAgent(FakeClient([invalid_output]), "m").run(HR_PROMOTIONS.text)
