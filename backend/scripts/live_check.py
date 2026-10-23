@@ -1,8 +1,8 @@
-"""Live check: run the three supplied use cases against the real Claude API.
+"""Live check: run the three supplied use cases against the configured live AI provider.
 
-This is separate from the pytest suite on purpose. It needs ANTHROPIC_API_KEY
-in backend/.env, costs a small amount per run, and its results depend on the
-model. Run from the backend folder:
+This is separate from the pytest suite on purpose. It needs the selected provider key
+(GEMINI_API_KEY or ANTHROPIC_API_KEY) in backend/.env. It costs a small amount per run,
+and its results depend on the model. Run from the backend folder:
 
     python -m scripts.live_check
 """
@@ -18,7 +18,11 @@ from app.governance.use_cases import USE_CASES
 
 
 def main() -> int:
-    agent = get_agent(get_settings())
+    settings = get_settings()
+    if not settings.configured_api_key:
+        print("Configure the selected provider key in backend/.env before running the live check.")
+        return 1
+    agent = get_agent(settings)
     failures = 0
     for use_case in USE_CASES:
         label = f"Use case {use_case.id}: {use_case.title}"

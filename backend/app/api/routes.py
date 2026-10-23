@@ -12,7 +12,7 @@ router = APIRouter(prefix="/api")
 
 @router.get("/health")
 def health(settings: SettingsDep) -> dict:
-    return {"status": "ok", "ai_configured": bool(settings.anthropic_api_key)}
+    return {"status": "ok", "ai_configured": bool(settings.configured_api_key)}
 
 
 @router.post("/assess", response_model=AssessmentResponse)

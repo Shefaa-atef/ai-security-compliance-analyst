@@ -5,7 +5,7 @@ import uuid
 from collections import Counter
 
 from . import audit, review_trail
-from .agent import AssessmentAgent, AssessmentUnavailable
+from .agent import AssessmentRunner, AssessmentUnavailable
 from .governance import risk_signals
 from .guardrails import output as output_guardrails
 from .guardrails.input import prepare_input
@@ -18,7 +18,7 @@ class ScenarioRejected(ValueError):
 
 def assess(
     scenario: str,
-    agent: AssessmentAgent,
+    agent: AssessmentRunner,
     audit_path: str,
     request_id: str | None = None,
 ) -> AssessmentResponse:

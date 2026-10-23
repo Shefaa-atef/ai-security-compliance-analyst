@@ -5,8 +5,11 @@ from typing import Annotated
 
 import anthropic
 from fastapi import Depends, HTTPException
+from google import genai
+from google.genai import types
 
 from ..agent import AssessmentAgent
+from ..agent.gemini import GeminiAssessmentAgent
 from ..config import Settings, get_settings
 from ..rate_limit import RateLimiter
 
@@ -25,9 +28,24 @@ def _claude_client(api_key: str) -> anthropic.Anthropic:
     return anthropic.Anthropic(api_key=api_key, max_retries=0)
 
 
-def get_agent(settings: SettingsDep) -> AssessmentAgent:
-    if not settings.anthropic_api_key:
+@lru_cache
+def _gemini_client(api_key: str):
+    return genai.Client(
+        api_key=api_key,
+        http_options=types.HttpOptions(retry_options=types.HttpRetryOptions(attempts=1)),
+    )
+
+
+def get_agent(settings: SettingsDep) -> AssessmentAgent | GeminiAssessmentAgent:
+    if not settings.configured_api_key:
         raise HTTPException(status_code=503, detail="AI assessment service is not configured.")
+    if settings.ai_provider == "gemini":
+        return GeminiAssessmentAgent(
+            _gemini_client(settings.gemini_api_key),
+            settings.gemini_model,
+            settings.max_agent_turns,
+            settings.request_deadline_seconds,
+        )
     return AssessmentAgent(
         _claude_client(settings.anthropic_api_key),
         settings.anthropic_model,
