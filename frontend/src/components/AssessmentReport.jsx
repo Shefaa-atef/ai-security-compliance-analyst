@@ -1,6 +1,7 @@
 import Icon from "./Icon";
 import FindingRow from "./FindingRow";
 import EmptyReport from "./EmptyReport";
+import FindingOverview from "./FindingOverview";
 export default function AssessmentReport({ result, loading, reportRef }) {
   function download() {
     const url = URL.createObjectURL(
@@ -55,13 +56,20 @@ export default function AssessmentReport({ result, loading, reportRef }) {
             <span className={`risk-pill risk-${result.risk_level}`}>
               <span /> {result.risk_level} risk
             </span>
-            <h3>Review before moving forward.</h3>
+            <h3>
+              {result.risk_level === "high"
+                ? "Give this use case a closer review."
+                : result.risk_level === "unknown"
+                  ? "More context is needed."
+                  : "Your findings, in focus."}
+            </h3>
             <p>{result.summary}</p>
             <details className="risk-detail">
               <summary>Why this risk level?</summary>
               <p>{result.risk_rationale}</p>
             </details>
           </div>
+          <FindingOverview findings={result.findings} />
           <div className="findings-heading">
             <h3>Requirement review</h3>
             <span>Expand to see the evidence</span>

@@ -20,6 +20,11 @@ export default function App() {
     setResult(null);
     setError("");
   }
+  function changeScenario(value) {
+    setScenario(value);
+    setResult(null);
+    setError("");
+  }
   async function submit(event) {
     event.preventDefault();
     setError("");
@@ -34,7 +39,10 @@ export default function App() {
       setResult({ ...assessment, isSample: mode === "sample" });
       requestAnimationFrame(() =>
         reportRef.current?.scrollIntoView({
-          behavior: "smooth",
+          behavior: window.matchMedia("(prefers-reduced-motion: reduce)")
+            .matches
+            ? "auto"
+            : "smooth",
           block: "start",
         }),
       );
@@ -76,7 +84,7 @@ export default function App() {
             mode={mode}
             onModeChange={changeMode}
             scenario={scenario}
-            onScenarioChange={setScenario}
+            onScenarioChange={changeScenario}
             onSubmit={submit}
             loading={loading}
             error={error}
