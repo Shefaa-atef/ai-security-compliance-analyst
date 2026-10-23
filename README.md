@@ -32,7 +32,7 @@ Open the local URL printed by Vite. The development server proxies `/api` to por
 - **Sample preview** shows a fixed, clearly labeled customer support report without calling AI.
 - **Assess a scenario** accepts a sanitized scenario or one of the three examples and calls the Python backend. A valid provider key and working provider connection are required.
 - Expand any requirement to inspect its evidence, explanation, and action. Review guardrail observations for redactions and output corrections. Export the report as JSON when needed.
-- The header language selector switches between English and Arabic, including right-to-left layout. Authored examples and sample content are translated; live model output is shown in its returned language.
+- The header language selector switches between English and Arabic, including right-to-left layout. Authored examples and sample content are translated; live analysis follows the selected language, while evidence stays in the original scenario language. Switching languages offers reassessment of an existing live report.
 
 ## Assessment workflow
 
@@ -65,7 +65,7 @@ cd backend
 .\.venv\Scripts\python.exe -m pytest -q
 ```
 
-The backend test suite contains 58 deterministic tests, and the frontend suite contains 9 tests. The deterministic backend tests use a fake model. Passing them does not prove live model availability or quality. For the separate real-provider check, configure the backend key and run `python -m scripts.live_check` from `backend/`. This sends the three fictional scenarios to the configured provider.
+The backend test suite contains 64 deterministic tests, and the frontend suite contains 10 tests. The deterministic backend tests use a fake model. Passing them does not prove live model availability or quality. For the separate real-provider check, configure the backend key and run `python -m scripts.live_check` from `backend/`. This sends the three fictional scenarios to the configured provider.
 
 ## Screenshots and verification
 
@@ -76,6 +76,8 @@ Desktop live AI assessment, with the actual review activity expanded:
 ![Live AI assessment in the desktop interface](docs/screenshots/live-assessment-desktop.png)
 
 [View the live employee-decision assessment with expanded oversight evidence](docs/screenshots/live-employee-review.png).
+
+[View a live Arabic analysis with original English evidence](docs/screenshots/live-arabic-response.png). The Arabic narrative, recommendations, review trail, and evidence preservation were verified against a live response.
 
 Illustrative sample preview on desktop (no model call):
 

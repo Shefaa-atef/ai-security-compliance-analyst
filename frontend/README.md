@@ -37,7 +37,7 @@ See [backend handoff](../docs/backend-handoff.md) for the complete contract and 
 
 ## Languages
 
-English and Arabic are available from the header language selector, including right-to-left layout and translated sample content. See [localization notes](../docs/frontend-localization.md) for adding languages and the distinction between UI translation and live model output.
+English and Arabic are available from the header language selector, including right-to-left layout and translated sample content. Live requests include `response_language`; narrative follows that language while evidence stays in the original scenario language. Existing results retain their recorded language, with a reassessment action after switching languages. See [localization notes](../docs/frontend-localization.md) for adding languages and the distinction between UI translation and live model output.
 
 Run localization checks from this folder with `node --test tests/i18n.test.js`.
 

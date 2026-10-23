@@ -1,5 +1,7 @@
 # Backend handoff: AI Security & Compliance Analyst
 
+Current API extension: requests may include `response_language` (`en` or `ar`, default `en`); responses record it. Narrative and server messages follow that language, while evidence stays in the original scenario language.
+
 Build only the Python backend in `backend/`. The React frontend is implemented separately. Do not edit frontend files or change this API contract without coordination. Use FastAPI and Pydantic, with small modules for routes, schemas, requirement catalog, agent workflow, and model integration. Use original implementation and standard libraries/SDKs; no pre-built assessment solution.
 
 ## Scope and priorities

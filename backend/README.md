@@ -168,7 +168,7 @@ The deterministic tests script the model's replies. They cover the agent loop, a
 - Redaction, injection detection and risk signals are pattern-based. They reduce risk but are not complete defenses.
 - Rate limiting and the audit log are single-process. Several instances would need a shared store.
 - There is no user authentication. A real deployment would sit behind company SSO.
-- Reports are in English, even when the interface is in Arabic.
+- Responses support English and Modern Standard Arabic. Evidence remains in the source scenario language; multilingual input heuristics are still primarily English.
 - Results are preliminary and support a human governance reviewer. They are not deployment approval.
 
 
@@ -190,3 +190,16 @@ Implementation references: [Google function calling](https://ai.google.dev/gemin
 ### Observed live verification
 
 On 2026-10-23, all three fictional use cases completed with the Gemini adapter and returned eight findings, verified evidence, recommended actions, and an actual tool-use trail. The observed model was `gemini-3.5-flash-lite`: A and B were medium risk with human oversight supported; C was high risk with an oversight gap. Results are model-dependent, not golden expected outputs. No real customer or employee information was used.
+
+
+## Response languages
+
+`POST /api/assess` accepts optional `response_language`, currently `en` (default) or `ar`. The response records `response_language`. For example:
+
+```json
+{"scenario": "A fictional internal security assistant with human review.", "response_language": "ar"}
+```
+
+The selected language controls model-authored summary, rationale, findings, recommendations, and questions, as well as server-authored guardrail corrections, fallback messages, and the actual review trail. Schema keys, requirement IDs, and enum values remain stable English identifiers. Evidence is copied from the sanitized original scenario and is never translated. Switching UI language does not modify a previous live result; the UI offers reassessment in the new language.
+
+To add a report language, extend `app/i18n`'s supported language type and registry, add a complete catalog, and register the equivalent frontend locale. Catalog parity and placeholder tests cover all backend catalogs. Language compliance by the model is instructed rather than guaranteed; human review remains necessary.

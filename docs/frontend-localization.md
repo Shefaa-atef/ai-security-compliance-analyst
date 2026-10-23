@@ -15,4 +15,8 @@ The provider sets document `lang`, `dir`, and title; it remembers only the langu
 
 RTL uses logical CSS spacing, Arabic-friendly typography, mirrored directional icons, and isolated requirement/reference IDs. User input and live model text use automatic text direction. Language changes preserve user input.
 
-Authored scenarios, requirements, sample findings, errors, accessible labels, and navigation are localized. The fixed sample report switches languages immediately, including evidence that matches the translated sample scenario. Live backend content is displayed as returned: translating evidence after generation could change its meaning. Localizing model-generated analysis requires an explicit backend response-language contract and corresponding end-to-end validation; the current API request is unchanged.
+Authored scenarios, requirements, sample findings, errors, accessible labels, and navigation are localized. The fixed sample report switches languages immediately, including evidence that matches the translated sample scenario.
+
+Live requests include `response_language` (`en` or `ar`). The backend instructs the selected model to generate narrative in that language and localizes server-authored guardrail messages and review activity using its own catalogs. Evidence remains verbatim in the original sanitized scenario; it is never translated after generation. The returned `response_language` is preserved in the report and JSON export. Changing UI language shows a mismatch notice and offers reassessment, without silently relabeling the previous findings.
+
+When adding a new language, also extend the backend supported-language type, language-name registry, and catalog in `backend/app/i18n`. Frontend and backend language support are an explicit API contract. Model language compliance needs a live check; deterministic tests validate instruction propagation and authored translations, not model behavior.
